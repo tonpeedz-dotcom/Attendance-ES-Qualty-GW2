@@ -1260,11 +1260,11 @@
         }
       });
 
-      let lineText = `Attendance Report\n`;
-      lineText += `Date : ${selectedFormatted}\n`;
-      lineText += `Attendance : ${statRatio} (${statPercent})\n\n`;
+      let lineText = `🎯Attendance Report\n`;
+      lineText += `📅Date : ${selectedFormatted}\n`;
+      lineText += `👤Attendance : ${statRatio} (${statPercent})\n\n`;
 
-      lineText += `มาทำงาน :\n`;
+      lineText += `✅มาทำงาน :\n`;
       if (presentList.length > 0) {
         presentList.forEach((name, i) => {
           lineText += `${i + 1}.${name}\n`;
@@ -1273,7 +1273,7 @@
         lineText += `- ไม่มี -\n`;
       }
 
-      lineText += `\nไม่มาทำงาน :\n`;
+      lineText += `\n❌ไม่มาทำงาน :\n`;
       if (leaveList.length > 0) {
         leaveList.forEach((item, i) => {
           lineText += `${i + 1}.${item}\n`;
