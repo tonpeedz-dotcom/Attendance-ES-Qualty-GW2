@@ -85,6 +85,17 @@
     select, input, button {
       font-size: 16px !important;
     }
+
+    optgroup {
+      font-weight: 800;
+      color: #334155;
+      background-color: #f8fafc;
+    }
+
+    option {
+      font-weight: 600;
+      padding: 6px;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
@@ -346,7 +357,7 @@
     </div>
   </main>
 
-  <!-- ================= SECTION: แผนลาพักร้อน / ลากิจ ใน 5 วันทำการข้างหน้า ================= -->
+  <!-- ================= SECTION: แผนลาพักร้อน / ลากิจ / On Duty ใน 5 วันทำการข้างหน้า ================= -->
   <section class="max-w-6xl mx-auto px-4 mt-8">
     <div class="bg-slate-900 text-white p-6 sm:p-7 rounded-3xl shadow-xl border border-slate-800">
       
@@ -354,7 +365,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-800/80 gap-2">
         <div>
           <h3 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
-            <span>🏖️</span> แผนลาพักร้อน / ลากิจ ใน 5 วันทำการข้างหน้า
+            <span>🏖️</span> แผนลาพักร้อน / ลากิจ / On Duty ใน 5 วันทำการข้างหน้า
           </h3>
           <p class="text-slate-400 text-xs sm:text-sm mt-0.5" id="upcomingRangeDesc">
             เรียงตามวันที่ใกล้ที่สุด (ไม่นับวันเสาร์ - อาทิตย์)
@@ -471,6 +482,124 @@
       "วีระพงษ์ ทามแก้ว"
     ];
 
+    // โครงสร้างตัวเลือกสถานะ จัดกลุ่มชัดเจน
+    const STATUS_GROUPS = [
+      {
+        groupName: "ปฏิบัติงาน",
+        icon: "🟢",
+        options: [
+          { id: "PRESENT", label: "มาทำงาน", isLeave: false, needHours: false, needNote: false, category: "PRESENT" }
+        ]
+      },
+      {
+        groupName: "ลาพักร้อน",
+        icon: "🏖️",
+        options: [
+          { id: "VACATION_FULL", label: "ลาพักร้อน เต็มวัน", isLeave: true, needHours: false, needNote: false, category: "VACATION" },
+          { id: "VACATION_MORNING", label: "ลาพักร้อน ครึ่งวันเช้า", isLeave: true, needHours: false, needNote: false, category: "VACATION" },
+          { id: "VACATION_AFTERNOON", label: "ลาพักร้อน ครึ่งวันบ่าย", isLeave: true, needHours: false, needNote: false, category: "VACATION" },
+          { id: "VACATION_HR", label: "ลาพักร้อน (ระบุ ชม.)", isLeave: true, needHours: true, needNote: false, prefix: "ลาพักร้อน", category: "VACATION" }
+        ]
+      },
+      {
+        groupName: "ลากิจ",
+        icon: "💼",
+        options: [
+          { id: "BUSINESS_FULL", label: "ลากิจ เต็มวัน", isLeave: true, needHours: false, needNote: false, category: "BUSINESS" },
+          { id: "BUSINESS_MORNING", label: "ลากิจ ครึ่งวันเช้า", isLeave: true, needHours: false, needNote: false, category: "BUSINESS" },
+          { id: "BUSINESS_AFTERNOON", label: "ลากิจ ครึ่งวันบ่าย", isLeave: true, needHours: false, needNote: false, category: "BUSINESS" },
+          { id: "BUSINESS_HR", label: "ลากิจ (ระบุ ชม.)", isLeave: true, needHours: true, needNote: false, prefix: "ลากิจ", category: "BUSINESS" }
+        ]
+      },
+      {
+        groupName: "ลาป่วย",
+        icon: "🤒",
+        options: [
+          { id: "SICK_FULL", label: "ลาป่วย เต็มวัน", isLeave: true, needHours: false, needNote: false, category: "SICK" },
+          { id: "SICK_MORNING", label: "ลาป่วย ครึ่งวันเช้า", isLeave: true, needHours: false, needNote: false, category: "SICK" },
+          { id: "SICK_AFTERNOON", label: "ลาป่วย ครึ่งวันบ่าย", isLeave: true, needHours: false, needNote: false, category: "SICK" },
+          { id: "SICK_HR", label: "ลาป่วย (ระบุ ชม.)", isLeave: true, needHours: true, needNote: false, prefix: "ลาป่วย", category: "SICK" }
+        ]
+      },
+      {
+        groupName: "ปฏิบัติงานนอกสถานที่",
+        icon: "🚗",
+        options: [
+          { id: "ONDUTY", label: "ลา On Duty (ระบุรายละเอียด)", isLeave: true, needHours: false, needNote: true, prefix: "ลา On Duty", category: "ONDUTY" }
+        ]
+      },
+      {
+        groupName: "ขาดงาน",
+        icon: "⚠️",
+        options: [
+          { id: "ABSENT", label: "ขาดงาน", isLeave: true, needHours: false, needNote: false, category: "ABSENT" }
+        ]
+      }
+    ];
+
+    const BASE_STATUS_OPTIONS = STATUS_GROUPS.flatMap(g => g.options);
+    const ALLOWED_HOURS = [1, 2, 3, 5, 6, 7]; // ตัด 4 ชม. (ครึ่งวัน) และ 8 ชม. (เต็มวัน) ออก
+
+    function getCategoryMeta(category) {
+      switch(category) {
+        case "PRESENT":
+          return {
+            badgeText: "มาทำงาน",
+            badgeClass: "bg-emerald-100 text-emerald-700 border border-emerald-300",
+            formCardClass: "bg-slate-50 border-slate-200",
+            previewCardClass: "bg-white border-slate-200 text-slate-800",
+            previewDotClass: "bg-emerald-500",
+            previewBadgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200"
+          };
+        case "VACATION":
+          return {
+            badgeText: "🏖️ พักร้อน",
+            badgeClass: "bg-teal-100 text-teal-800 border border-teal-300",
+            formCardClass: "bg-teal-50/60 border-teal-300",
+            previewCardClass: "bg-teal-50/90 border-teal-300 text-teal-950 shadow-sm ring-1 ring-teal-200",
+            previewDotClass: "bg-teal-600 animate-pulse",
+            previewBadgeClass: "bg-teal-600 text-white border-teal-600 shadow"
+          };
+        case "BUSINESS":
+          return {
+            badgeText: "💼 ลากิจ",
+            badgeClass: "bg-amber-100 text-amber-800 border border-amber-300",
+            formCardClass: "bg-amber-50/60 border-amber-300",
+            previewCardClass: "bg-amber-50/90 border-amber-300 text-amber-950 shadow-sm ring-1 ring-amber-200",
+            previewDotClass: "bg-amber-600 animate-pulse",
+            previewBadgeClass: "bg-amber-600 text-white border-amber-600 shadow"
+          };
+        case "SICK":
+          return {
+            badgeText: "🤒 ลาป่วย",
+            badgeClass: "bg-rose-100 text-rose-800 border border-rose-300",
+            formCardClass: "bg-rose-50/60 border-rose-300",
+            previewCardClass: "bg-rose-50/90 border-rose-300 text-rose-950 shadow-sm ring-1 ring-rose-200",
+            previewDotClass: "bg-rose-600 animate-pulse",
+            previewBadgeClass: "bg-rose-600 text-white border-rose-600 shadow"
+          };
+        case "ONDUTY":
+          return {
+            badgeText: "🚗 On Duty",
+            badgeClass: "bg-indigo-100 text-indigo-800 border border-indigo-300",
+            formCardClass: "bg-indigo-50/60 border-indigo-300",
+            previewCardClass: "bg-indigo-50/90 border-indigo-300 text-indigo-950 shadow-sm ring-1 ring-indigo-200",
+            previewDotClass: "bg-indigo-600 animate-pulse",
+            previewBadgeClass: "bg-indigo-600 text-white border-indigo-600 shadow"
+          };
+        case "ABSENT":
+        default:
+          return {
+            badgeText: "⚠️ ขาดงาน",
+            badgeClass: "bg-red-100 text-red-800 border border-red-300",
+            formCardClass: "bg-red-50/60 border-red-300",
+            previewCardClass: "bg-red-50/90 border-red-300 text-red-950 shadow-sm ring-1 ring-red-200",
+            previewDotClass: "bg-red-600 animate-pulse",
+            previewBadgeClass: "bg-red-600 text-white border-red-600 shadow"
+          };
+      }
+    }
+
     function getMembers() {
       const stored = localStorage.getItem("attendance_gw2_members");
       return stored ? JSON.parse(stored) : DEFAULT_MEMBERS;
@@ -479,16 +608,6 @@
     function saveMembers(list) {
       localStorage.setItem("attendance_gw2_members", JSON.stringify(list));
     }
-
-    const BASE_STATUS_OPTIONS = [
-      { id: "PRESENT", label: "มาทำงาน", isLeave: false, needHours: false },
-      { id: "VACATION_FULL", label: "ลาพักร้อน เต็มวัน", isLeave: true, needHours: false },
-      { id: "VACATION_HALF", label: "ลาพักร้อน ครึ่งวัน", isLeave: true, needHours: false },
-      { id: "VACATION_HR", label: "ลาพักร้อน (ระบุ ชม.)", isLeave: true, needHours: true, prefix: "ลาพักร้อน" },
-      { id: "BUSINESS_HR", label: "ลากิจ (ระบุ ชม.)", isLeave: true, needHours: true, prefix: "ลากิจ" },
-      { id: "SICK_HR", label: "ลาป่วย (ระบุ ชม.)", isLeave: true, needHours: true, prefix: "ลาป่วย" },
-      { id: "ABSENT", label: "ขาดงาน", isLeave: true, needHours: false }
-    ];
 
     const DEFAULT_DATE = "2026-10-15";
     let activeDate = DEFAULT_DATE;
@@ -516,7 +635,7 @@
     function initSeedData() {
       const db = getDB();
 
-      // ล้างข้อมูลเก่าที่มีตัวเลขลำดับ (เช่น "5.เศวต มาน้อย") ในทุกๆ วัน ป้องกันขึ้นเบิ้ล
+      // ล้างคีย์ที่มีตัวเลขนำหน้า เพื่อกันแสดงผลเบิ้ล
       for (let date in db) {
         const dayRec = db[date];
         if (dayRec && typeof dayRec === "object") {
@@ -533,16 +652,16 @@
 
       if (!db["2026-10-15"]) {
         db["2026-10-15"] = {
-          "พิบูลย์ ทีคำ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-          "สันทัศ ใจศิริ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-          "พีรเทพ ดีแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-          "พงษ์ศิริ แก้วสวัสดิ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-          "เศวต มาน้อย": { type: "VACATION_FULL", hours: 0, text: "ลาพักร้อน เต็มวัน" },
-          "อภิเชษฐ์ ศิริขันธุ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-          "วีระพงษ์ ทามแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" }
+          "พิบูลย์ ทีคำ": { type: "PRESENT", hours: 0, note: "", text: "มาทำงาน" },
+          "สันทัศ ใจศิริ": { type: "PRESENT", hours: 0, note: "", text: "มาทำงาน" },
+          "พีรเทพ ดีแก้ว": { type: "PRESENT", hours: 0, note: "", text: "มาทำงาน" },
+          "พงษ์ศิริ แก้วสวัสดิ์": { type: "PRESENT", hours: 0, note: "", text: "มาทำงาน" },
+          "เศวต มาน้อย": { type: "VACATION_FULL", hours: 0, note: "", text: "ลาพักร้อน เต็มวัน" },
+          "อภิเชษฐ์ ศิริขันธุ์": { type: "PRESENT", hours: 0, note: "", text: "มาทำงาน" },
+          "วีระพงษ์ ทามแก้ว": { type: "PRESENT", hours: 0, note: "", text: "มาทำงาน" }
         };
       } else {
-        db["2026-10-15"]["เศวต มาน้อย"] = { type: "VACATION_FULL", hours: 0, text: "ลาพักร้อน เต็มวัน" };
+        db["2026-10-15"]["เศวต มาน้อย"] = { type: "VACATION_FULL", hours: 0, note: "", text: "ลาพักร้อน เต็มวัน" };
       }
 
       saveDB(db);
@@ -694,9 +813,7 @@
       const isInDatabase = MASTER_GATEWAY_NAMES.includes(name);
       if (!isInDatabase) {
         const isConfirm = confirm(`ต้องการที่จะ เพิ่มรายชื่อนี้ "${name}" (ที่ไม่อยู่ในฐานข้อมูล) ใช่หรือไม่?`);
-        if (!isConfirm) {
-          return;
-        }
+        if (!isConfirm) return;
       }
 
       members.push(name);
@@ -774,39 +891,68 @@
       }
 
       members.forEach((member, idx) => {
-        let item = records[member] || records[`${idx + 1}.${member}`] || { type: "PRESENT", hours: 1, text: "มาทำงาน" };
+        let item = records[member] || records[`${idx + 1}.${member}`] || { type: "PRESENT", hours: 1, note: "", text: "มาทำงาน" };
         if (typeof item === "string") {
-          item = { type: item.includes("ลา") ? "VACATION_FULL" : "PRESENT", hours: 1, text: item };
+          let inferType = "PRESENT";
+          if (item.includes("พักร้อน")) inferType = "VACATION_FULL";
+          else if (item.includes("ลากิจ")) inferType = "BUSINESS_FULL";
+          else if (item.includes("ลาป่วย")) inferType = "SICK_FULL";
+          else if (item.includes("On Duty") || item.includes("on duty")) inferType = "ONDUTY";
+          else if (item.includes("ขาดงาน")) inferType = "ABSENT";
+          item = { type: inferType, hours: 1, note: "", text: item };
         }
 
-        const div = document.createElement("div");
-        div.className = "p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-2";
-
         const currentType = item.type || "PRESENT";
-        const currentHours = item.hours || 1;
+        const currentHours = ALLOWED_HOURS.includes(Number(item.hours)) ? Number(item.hours) : 1;
+        const currentNote = item.note || "";
         const config = BASE_STATUS_OPTIONS.find(o => o.id === currentType) || BASE_STATUS_OPTIONS[0];
+        const meta = getCategoryMeta(config.category);
+
+        const div = document.createElement("div");
+        div.id = `memberRow_${idx}`;
+        div.className = `p-3.5 rounded-2xl border transition flex flex-col gap-2.5 ${meta.formCardClass}`;
 
         div.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="font-bold text-slate-800 text-base">${idx + 1}. ${member}</span>
-            <span id="badge_${idx}" class="text-xs px-2 py-0.5 rounded font-bold ${config.isLeave ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
-              ${config.isLeave ? 'ลา/ไม่มา' : 'มาทำงาน'}
+            <span id="badge_${idx}" class="text-xs px-2.5 py-0.5 rounded-full font-bold ${meta.badgeClass}">
+              ${meta.badgeText}
             </span>
           </div>
-          <div class="flex items-center gap-2">
-            <select id="type_${idx}" onchange="onStatusChange(${idx})" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
-              ${BASE_STATUS_OPTIONS.map(opt => `
-                <option value="${opt.id}" ${opt.id === currentType ? "selected" : ""}>${opt.label}</option>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <select id="type_${idx}" onchange="onStatusChange(${idx})" class="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+              ${STATUS_GROUPS.map(group => `
+                <optgroup label="${group.icon}${group.groupName}">
+                  ${group.options.map(opt => `
+                    <option value="${opt.id}" ${opt.id === currentType ? "selected" : ""}>
+                      ${opt.label}
+                    </option>
+                  `).join("")}
+                </optgroup>
               `).join("")}
             </select>
             
-            <div id="hourWrapper_${idx}" class="${config.needHours ? 'flex' : 'hidden'} items-center gap-1 min-w-[100px]">
-              <select id="hours_${idx}" onchange="updateLivePreview()" class="w-full bg-white border border-slate-300 rounded-xl px-2 py-2 text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
-                ${[1,2,3,4,5,6,7].map(h => `
-                  <option value="${h}" ${h === Number(currentHours) ? "selected" : ""}>${h} ชม.</option>
+            <!-- ช่องเลือกชั่วโมง (มีแค่ 1, 2, 3, 5, 6, 7 ชม.) -->
+            <div id="hourWrapper_${idx}" class="${config.needHours ? 'flex' : 'hidden'} items-center gap-1 min-w-[110px]">
+              <select id="hours_${idx}" onchange="updateLivePreview()" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-sm sm:text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                ${ALLOWED_HOURS.map(h => `
+                  <option value="${h}" ${h === currentHours ? "selected" : ""}>${h} ชม.</option>
                 `).join("")}
               </select>
             </div>
+          </div>
+
+          <!-- ช่องกรอกรายละเอียด On Duty -->
+          <div id="noteWrapper_${idx}" class="${config.needNote ? 'block' : 'hidden'} pt-0.5">
+            <input 
+              type="text" 
+              id="note_${idx}" 
+              placeholder="ระบุรายละเอียด On Duty เช่น ไป Samrong / อบรม / ไป บ.แม่..." 
+              value="${currentNote}" 
+              oninput="updateLivePreview()" 
+              class="w-full bg-white border border-indigo-300 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none placeholder:text-slate-400 shadow-inner"
+            />
           </div>
         `;
         container.appendChild(div);
@@ -816,9 +962,15 @@
     function onStatusChange(idx) {
       const typeSelect = document.getElementById(`type_${idx}`);
       const hourWrapper = document.getElementById(`hourWrapper_${idx}`);
-      const typeVal = typeSelect.value;
-      const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal);
+      const noteWrapper = document.getElementById(`noteWrapper_${idx}`);
+      const rowElem = document.getElementById(`memberRow_${idx}`);
+      const badge = document.getElementById(`badge_${idx}`);
 
+      const typeVal = typeSelect.value;
+      const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
+      const meta = getCategoryMeta(config.category);
+
+      // เปิด/ปิดช่องระบุชั่วโมง
       if (config.needHours) {
         hourWrapper.classList.remove("hidden");
         hourWrapper.classList.add("flex");
@@ -827,14 +979,19 @@
         hourWrapper.classList.remove("flex");
       }
 
-      const badge = document.getElementById(`badge_${idx}`);
-      if (config.isLeave) {
-        badge.className = "text-xs px-2 py-0.5 rounded font-bold bg-red-100 text-red-700";
-        badge.innerText = "ลา/ไม่มา";
+      // เปิด/ปิดช่องกรอกรายละเอียด On Duty
+      if (config.needNote) {
+        noteWrapper.classList.remove("hidden");
+        noteWrapper.classList.add("block");
       } else {
-        badge.className = "text-xs px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-700";
-        badge.innerText = "มาทำงาน";
+        noteWrapper.classList.add("hidden");
+        noteWrapper.classList.remove("block");
       }
+
+      // อัปเดตสีการ์ดและ Badge
+      badge.className = `text-xs px-2.5 py-0.5 rounded-full font-bold ${meta.badgeClass}`;
+      badge.innerText = meta.badgeText;
+      rowElem.className = `p-3.5 rounded-2xl border transition flex flex-col gap-2.5 ${meta.formCardClass}`;
 
       updateLivePreview();
       renderUpcomingVacations();
@@ -851,16 +1008,21 @@
       members.forEach((member, idx) => {
         const typeElem = document.getElementById(`type_${idx}`);
         const hourElem = document.getElementById(`hours_${idx}`);
+        const noteElem = document.getElementById(`note_${idx}`);
 
         if (!typeElem) return;
 
         const typeVal = typeElem.value;
         const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
-        let statusText = config.label;
+        const meta = getCategoryMeta(config.category);
 
+        let statusText = config.label;
         if (config.needHours) {
           const hrs = hourElem ? hourElem.value : 1;
           statusText = `${config.prefix} ${hrs} ชม.`;
+        } else if (config.needNote) {
+          const noteVal = noteElem ? noteElem.value.trim() : "";
+          statusText = noteVal ? `ลา On Duty (${noteVal})` : `ลา On Duty`;
         }
 
         const isLeave = config.isLeave;
@@ -869,24 +1031,16 @@
         }
 
         const li = document.createElement("li");
-        li.className = `p-2.5 sm:p-3 rounded-2xl border transition flex justify-between items-center ${
-          isLeave 
-            ? 'bg-rose-100/90 border-rose-400 text-rose-950 shadow-sm ring-1 ring-rose-300' 
-            : 'bg-white border-slate-200 text-slate-800'
-        }`;
+        li.className = `p-2.5 sm:p-3 rounded-2xl border transition flex justify-between items-center ${meta.previewCardClass}`;
 
         li.innerHTML = `
           <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full ${isLeave ? 'bg-rose-600 animate-pulse' : 'bg-emerald-500'}"></span>
-            <span class="font-bold text-base sm:text-lg ${isLeave ? 'text-rose-950 font-black' : 'text-slate-800'}">
+            <span class="w-3 h-3 rounded-full ${meta.previewDotClass}"></span>
+            <span class="font-bold text-base sm:text-lg ${isLeave ? 'font-black' : 'text-slate-800'}">
               ${idx + 1}. ${member}
             </span>
           </div>
-          <span class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-bold border ${
-            isLeave 
-              ? 'bg-rose-600 text-white border-rose-600 shadow' 
-              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-          }">
+          <span class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-bold border ${meta.previewBadgeClass}">
             ${statusText}
           </span>
         `;
@@ -928,15 +1082,19 @@
         const typeVal = typeElem.value;
         const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal);
         const hours = config.needHours ? parseInt(document.getElementById(`hours_${idx}`).value, 10) : 0;
+        const note = config.needNote ? (document.getElementById(`note_${idx}`)?.value.trim() || "") : "";
         
         let text = config.label;
         if (config.needHours) {
           text = `${config.prefix} ${hours} ชั่วโมง`;
+        } else if (config.needNote) {
+          text = note ? `ลา On Duty (${note})` : `ลา On Duty`;
         }
 
         records[member] = {
           type: typeVal,
           hours: hours,
+          note: note,
           text: text
         };
       });
@@ -1116,7 +1274,7 @@
       }
 
       const leaveList = [];
-      const seenGuard = new Set(); // ป้องกันขึ้นเบิ้ล 100%
+      const seenGuard = new Set();
 
       next5Days.forEach(dayInfo => {
         let records = {};
@@ -1126,13 +1284,16 @@
           members.forEach((m, idx) => {
             const typeElem = document.getElementById(`type_${idx}`);
             const hourElem = document.getElementById(`hours_${idx}`);
+            const noteElem = document.getElementById(`note_${idx}`);
             if (typeElem) {
               const tVal = typeElem.value;
               const cfg = BASE_STATUS_OPTIONS.find(o => o.id === tVal);
               const hrs = (cfg && cfg.needHours && hourElem) ? hourElem.value : 0;
+              const note = (cfg && cfg.needNote && noteElem) ? noteElem.value.trim() : "";
               let txt = cfg ? cfg.label : "มาทำงาน";
               if (cfg && cfg.needHours) txt = `${cfg.prefix} ${hrs} ชั่วโมง`;
-              records[m] = { type: tVal, hours: hrs, text: txt };
+              else if (cfg && cfg.needNote) txt = note ? `ลา On Duty (${note})` : `ลา On Duty`;
+              records[m] = { type: tVal, hours: hrs, note: note, text: txt };
             }
           });
         } else {
@@ -1151,27 +1312,23 @@
           let desc = "";
 
           if (typeof rec === "string") {
-            if (rec.includes("ลากิจ")) {
-              type = "BUSINESS_HR";
-              desc = rec;
-            } else if (rec.includes("ลา") || rec.includes("พักร้อน")) {
-              type = "VACATION_FULL";
-              desc = rec;
-            }
+            desc = rec;
+            if (rec.includes("ลากิจ")) type = "BUSINESS_FULL";
+            else if (rec.includes("ลาป่วย")) type = "SICK_FULL";
+            else if (rec.includes("On Duty") || rec.includes("on duty")) type = "ONDUTY";
+            else if (rec.includes("ลา") || rec.includes("พักร้อน")) type = "VACATION_FULL";
           } else if (typeof rec === "object") {
             type = rec.type || "";
             desc = rec.text || "";
           }
 
-          const isVacation = type.startsWith("VACATION") || desc.includes("พักร้อน");
-          const isBusiness = type.startsWith("BUSINESS") || desc.includes("ลากิจ");
-
-          if (isVacation || isBusiness) {
+          const cfg = BASE_STATUS_OPTIONS.find(o => o.id === type);
+          if (cfg && cfg.isLeave) {
             seenGuard.add(uniqueKey);
             leaveList.push({
               member: cleanName,
-              desc: desc || (isBusiness ? "ลากิจ" : "ลาพักร้อน"),
-              isBusiness: isBusiness,
+              desc: desc || cfg.label,
+              category: cfg.category,
               dateInfo: dayInfo
             });
           }
@@ -1186,46 +1343,74 @@
         container.innerHTML = `
           <div class="p-8 text-center bg-slate-800/50 rounded-2xl border border-dashed border-slate-700">
             <span class="text-3xl block mb-2">🌴</span>
-            <span class="text-slate-300 font-bold block text-base">ไม่มีสมาชิกวางแผนลาพักร้อน หรือ ลากิจ ในช่วง 5 วันทำการข้างหน้า</span>
+            <span class="text-slate-300 font-bold block text-base">ไม่มีสมาชิกวางแผนลาพักร้อน, ลากิจ หรือ On Duty ในช่วง 5 วันทำการข้างหน้า</span>
             <span class="text-xs text-slate-500 mt-1 block">สามารถคลิกเลือกวันในปฏิทินเพื่อวางแผนและบันทึกการลาล่วงหน้าได้</span>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = leaveList.map(item => `
-        <div class="flex items-center justify-between p-3.5 sm:p-4 bg-slate-800/90 hover:bg-slate-800 border ${item.isBusiness ? 'border-amber-500/40' : 'border-teal-500/40'} rounded-2xl shadow-sm transition">
-          <div class="flex items-center gap-3.5">
-            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${item.isBusiness ? 'bg-[#3d2706] border border-amber-500/40 text-amber-300' : 'bg-[#0e3b3a] border border-[#14b8a6]/40 text-[#2dd4bf]'} flex flex-col items-center justify-center shrink-0 shadow-inner">
-              <span class="text-xl sm:text-2xl font-black leading-none">${item.dateInfo.dayNumber}</span>
-              <span class="text-[11px] sm:text-xs font-bold leading-tight mt-0.5">${item.dateInfo.monthName}</span>
-            </div>
-            
-            <div>
-              <h4 class="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
-                ${item.member}
-                <span class="text-[11px] px-2 py-0.5 rounded-full font-bold ${item.isBusiness ? 'bg-amber-950 text-amber-300 border border-amber-600/40' : 'bg-teal-950 text-teal-300 border border-teal-600/40'}">
-                  ${item.isBusiness ? '💼 ลากิจ' : '🏖️ พักร้อน'}
-                </span>
-              </h4>
-              <p class="text-xs sm:text-sm text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
-                <span class="w-2 h-2 rounded-full ${item.isBusiness ? 'bg-amber-400' : 'bg-cyan-400'} inline-block"></span>
-                <span>${item.desc}</span>
-                <span class="text-slate-500">• ${item.dateInfo.dayName}</span>
-              </p>
-            </div>
-          </div>
+      container.innerHTML = leaveList.map(item => {
+        let tagIcon = "🏖️";
+        let tagText = "พักร้อน";
+        let cardBorder = "border-teal-500/40";
+        let numBoxBg = "bg-[#0e3b3a] border-[#14b8a6]/40 text-[#2dd4bf]";
+        let badgeBg = "bg-teal-950 text-teal-300 border-teal-600/40";
 
-          <div class="text-right shrink-0">
-            <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold ${item.isBusiness ? 'bg-amber-950/80 text-amber-300 border border-amber-500/30' : 'bg-[#093331] text-[#2dd4bf] border border-[#14b8a6]/30'} shadow-sm">
-              ${item.dateInfo.relativeBadge}
-            </span>
+        if (item.category === "BUSINESS") {
+          tagIcon = "💼";
+          tagText = "ลากิจ";
+          cardBorder = "border-amber-500/40";
+          numBoxBg = "bg-[#3d2706] border-amber-500/40 text-amber-300";
+          badgeBg = "bg-amber-950 text-amber-300 border-amber-600/40";
+        } else if (item.category === "SICK") {
+          tagIcon = "🤒";
+          tagText = "ลาป่วย";
+          cardBorder = "border-rose-500/40";
+          numBoxBg = "bg-[#3b0e14] border-rose-500/40 text-rose-300";
+          badgeBg = "bg-rose-950 text-rose-300 border-rose-600/40";
+        } else if (item.category === "ONDUTY") {
+          tagIcon = "🚗";
+          tagText = "On Duty";
+          cardBorder = "border-indigo-500/40";
+          numBoxBg = "bg-[#1e1b4b] border-indigo-500/40 text-indigo-300";
+          badgeBg = "bg-indigo-950 text-indigo-300 border-indigo-600/40";
+        }
+
+        return `
+          <div class="flex items-center justify-between p-3.5 sm:p-4 bg-slate-800/90 hover:bg-slate-800 border ${cardBorder} rounded-2xl shadow-sm transition">
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${numBoxBg} border flex flex-col items-center justify-center shrink-0 shadow-inner">
+                <span class="text-xl sm:text-2xl font-black leading-none">${item.dateInfo.dayNumber}</span>
+                <span class="text-[11px] sm:text-xs font-bold leading-tight mt-0.5">${item.dateInfo.monthName}</span>
+              </div>
+              
+              <div>
+                <h4 class="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+                  ${item.member}
+                  <span class="text-[11px] px-2 py-0.5 rounded-full font-bold border ${badgeBg}">
+                    ${tagIcon} ${tagText}
+                  </span>
+                </h4>
+                <p class="text-xs sm:text-sm text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span>
+                  <span>${item.desc}</span>
+                  <span class="text-slate-500">• ${item.dateInfo.dayName}</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="text-right shrink-0">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-slate-900 text-slate-200 border border-slate-700 shadow-sm">
+                ${item.dateInfo.relativeBadge}
+              </span>
+            </div>
           </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
-    // ================= ส่ง REPORT เข้า LINE (อัปเกรดเงื่อนไข > 10 คน) =================
+    // ================= ส่ง REPORT เข้า LINE (ฟอร์แมต Emoji ตามที่กำหนด) =================
     function shareTextToLine() {
       const selectedFormatted = formatDisplayDate(activeDate);
       const statRatio = document.getElementById("statRatio").innerText;
@@ -1238,12 +1423,17 @@
       members.forEach((member, idx) => {
         const typeElem = document.getElementById(`type_${idx}`);
         const hourElem = document.getElementById(`hours_${idx}`);
+        const noteElem = document.getElementById(`note_${idx}`);
+
         const typeVal = typeElem ? typeElem.value : "PRESENT";
         const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
 
         let statusDesc = config.label;
         if (config.needHours && hourElem) {
-          statusDesc = `${config.prefix} ${hourElem.value} ชั่วโมง`;
+          statusDesc = `${config.prefix} ${hourElem.value} ชม.`;
+        } else if (config.needNote && noteElem) {
+          const noteText = noteElem.value.trim();
+          statusDesc = noteText ? `ลา On Duty (${noteText})` : `ลา On Duty`;
         }
 
         if (config.isLeave) {
@@ -1257,7 +1447,7 @@
       lineText += `📅Date : ${selectedFormatted}\n`;
       lineText += `👤Attendance : ${statRatio} (${statPercent})\n\n`;
 
-      // 🎯 เงื่อนไข: ถ้าพนักงานเกิน 10 คน จะไม่ใส่หัวข้อ "มาทำงาน :"
+      // เงื่อนไข: ถ้าสมาชิก <= 10 คน ให้แสดงรายชื่อคนมาทำงานปกติ
       if (members.length <= 10) {
         lineText += `✅มาทำงาน :\n`;
         if (presentList.length > 0) {
@@ -1267,10 +1457,9 @@
         } else {
           lineText += `- ไม่มี -\n`;
         }
-        lineText += `\n`;
-        lineText += `❌ไม่มาทำงาน (${leaveList.length} คน) :\n`;
+        lineText += `\n❌ไม่มาทำงาน :\n`;
       } else {
-        // กรณีเกิน 10 คน: ใส่เฉพาะหัวข้อ ❌ไม่มาทำงาน พร้อมระบุจำนวนคน
+        // กรณีเกิน 10 คน: แสดงเฉพาะคนที่ไม่มาทำงาน
         lineText += `❌ไม่มาทำงาน (${leaveList.length} คน) :\n`;
       }
 
