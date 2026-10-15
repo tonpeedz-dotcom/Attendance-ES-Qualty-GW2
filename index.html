@@ -507,7 +507,7 @@
       }
     }
 
-    // ================= ระบบ AUTO MATCHING ปรับปรุงความแม่นยำสูง =================
+    // ================= ระบบ AUTO MATCHING =================
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
@@ -516,7 +516,6 @@
       const box = document.getElementById("autoMatchBox");
       let cleanQ = query.trim();
 
-      // ตัดคำนำหน้าออกอัตโนมัติหากผู้ใช้เผลอพิมพ์
       ['ว่าที่ร.ต.', 'ว่าที่ ร.ต.', 'น.ส.', 'นางสาว', 'นาง', 'นาย'].forEach(p => {
         if (cleanQ.startsWith(p)) {
           cleanQ = cleanQ.substring(p.length).trim();
@@ -529,7 +528,6 @@
         return;
       }
 
-      // แยกคำค้นหาตามช่องว่าง รองรับการพิมพ์ชื่อหรือนามสกุลก่อน-หลัง
       const searchWords = cleanQ.split(/\s+/).filter(w => w.length > 0);
 
       const matches = MASTER_GATEWAY_NAMES.filter(fullName => {
@@ -558,7 +556,6 @@
         const item = document.createElement("div");
         item.className = "px-4 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 cursor-pointer flex justify-between items-center transition border-b border-slate-100 last:border-none";
         
-        // ไฮไลต์คำที่ตรงกัน
         let highlighted = name;
         searchWords.forEach(w => {
           try {
@@ -631,24 +628,39 @@
       });
     }
 
+    // ================= ฟังก์ชันเพิ่มสมาชิกใหม่ (พร้อมเงื่อนไขตรวจสอบ & ยืนยัน) =================
     function addNewMember() {
       const input = document.getElementById("newMemberName");
       let name = input.value.trim();
       
+      // ดักตัดคำนำหน้าออกหากผู้ใช้เผลอพิมพ์
       ['ว่าที่ร.ต.', 'ว่าที่ ร.ต.', 'น.ส.', 'นางสาว', 'นาง', 'นาย'].forEach(p => {
         if (name.startsWith(p)) {
           name = name.substring(p.length).trim();
         }
       });
+      name = name.replace(/\s+/g, ' ').trim();
 
       if (!name) return;
 
       const members = getMembers();
+
+      // 1. ตรวจสอบว่ามีชื่อนี้อยู่ในรายชื่อสมาชิกเดิมแล้วหรือไม่
       if (members.includes(name)) {
-        alert("มีชื่อนี้อยู่ในรายชื่อทีมแล้วครับ");
+        alert("ชื่อนี้มีใน รายชื่อสมาชิกแล้ว");
         return;
       }
 
+      // 2. ตรวจสอบว่าชื่อนี้อยู่ในฐานข้อมูลพนักงาน Gateway (Auto Matching) หรือไม่
+      const isInDatabase = MASTER_GATEWAY_NAMES.includes(name);
+      if (!isInDatabase) {
+        const isConfirm = confirm(`ต้องการที่จะ เพิ่มรายชื่อนี้ "${name}" (ที่ไม่อยู่ในฐานข้อมูล) ใช่หรือไม่?`);
+        if (!isConfirm) {
+          return; // ผู้กรอกกดยกเลิก
+        }
+      }
+
+      // บันทึกรายชื่อใหม่เข้าสู่ทีม
       members.push(name);
       saveMembers(members);
       input.value = "";
@@ -1059,7 +1071,6 @@
       initSeedData();
       selectDate(DEFAULT_DATE);
 
-      // รองรับการกดปุ่ม Enter ในช่องค้นหาเพื่อเพิ่มชื่อได้ทันที
       const input = document.getElementById("newMemberName");
       if (input) {
         input.addEventListener("keydown", (e) => {
