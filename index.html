@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ตรวจสอบ Attendance ES Quality GW#2</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2canvas สำหรับ Export JPEG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Google Fonts: Sarabun & Orbitron -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+      font-size: 19px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Title ไฟนีออนกระพริบ */
+    .cool-title {
+      font-family: 'Orbitron', 'Sarabun', sans-serif;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6, #ec4899, #8b5cf6);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: neon-gradient 5s ease infinite, blink-glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes neon-gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes blink-glow {
+      0%, 100% {
+        filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 14px rgba(14, 165, 233, 0.4));
+        opacity: 1;
+      }
+      50% {
+        filter: drop-shadow(0 0 2px rgba(236, 72, 153, 0.4));
+        opacity: 0.85;
+      }
+      72% {
+        opacity: 0.95;
+      }
+      75% {
+        opacity: 0.35;
+      }
+      80% {
+        opacity: 1;
+      }
+    }
+
+    /* ไฮไลต์เสาร์-อาทิตย์สีเหลือง */
+    .weekend-col {
+      background-color: #fef3c7 !important;
+      color: #92400e !important;
+    }
+
+    /* วันปัจจุบัน (Today) กรอบแดง */
+    .today-marker {
+      border: 2.5px solid #ef4444 !important;
+      position: relative;
+    }
+    .today-marker::after {
+      content: "วันนี้";
+      position: absolute;
+      top: -9px;
+      right: -3px;
+      background-color: #ef4444;
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 0 4px;
+      border-radius: 999px;
+      line-height: 14px;
+    }
+
+    select, input, button {
+      font-size: 16px !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
+
+  <!-- ================= TOP NAVBAR ================= -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex justify-between items-center gap-2">
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSidebar(true)" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-3 py-2 rounded-xl text-sm sm:text-base font-bold shadow transition">
+          <span>📅</span>
+          <span class="hidden sm:inline">ปฏิทิน</span>
+        </button>
+
+        <button onclick="toggleMemberModal(true)" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-cyan-300 border border-slate-700 px-3 py-2 rounded-xl text-sm sm:text-base font-bold shadow transition">
+          <span>⚙️</span>
+          <span>จัดการสมาชิก</span>
+        </button>
+      </div>
+
+      <div class="text-right">
+        <span class="text-[11px] text-slate-400 block font-medium">วันที่เลือก</span>
+        <span id="activeDateNavbar" class="text-base sm:text-lg font-bold text-cyan-300">15-Oct-2026</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Title Banner -->
+  <div class="max-w-6xl mx-auto px-4 pt-4 sm:pt-6">
+    <div class="bg-slate-900 rounded-3xl p-5 sm:p-7 shadow-xl border border-slate-800 text-center relative overflow-hidden">
+      <span class="inline-block px-3 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/30 rounded-full text-xs sm:text-sm font-semibold tracking-wider mb-2">
+        ⚡ ES QUALITY GW#2 ATTENDANCE SYSTEM
+      </span>
+      <h1 class="cool-title text-xl sm:text-3xl lg:text-4xl font-extrabold uppercase py-1">
+        ตรวจสอบ Attendance ES Quality GW#2
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base mt-1">
+        ระบบเช็คชื่อ บันทึกประวัติ และวางแผนลาล่วงหน้ารายบุคคล
+      </p>
+    </div>
+  </div>
+
+  <!-- ================= SLIDE BAR ปฏิทิน ================= -->
+  <div id="drawerOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
+  <aside id="calendarDrawer" class="fixed top-0 left-0 bottom-0 w-full max-w-sm sm:max-w-md bg-white z-50 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="p-4 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">📅</span>
+        <h2 class="text-lg font-bold">ปฏิทิน & ประวัติย้อนหลัง</h2>
+      </div>
+      <button onclick="toggleSidebar(false)" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-lg active:scale-90 transition">
+        ✕
+      </button>
+    </div>
+
+    <div class="p-4 overflow-y-auto flex-1 space-y-4">
+      <div class="flex justify-between items-center bg-slate-50 p-2 rounded-2xl border border-slate-200">
+        <button onclick="changeMonth(-1)" class="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-700 font-extrabold flex items-center justify-center active:scale-90 transition">◀</button>
+        <span id="calendarMonthYear" class="text-lg font-bold text-indigo-800">October 2026</span>
+        <button onclick="changeMonth(1)" class="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-700 font-extrabold flex items-center justify-center active:scale-90 transition">▶</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+        <div class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-md bg-amber-200 border border-amber-300 inline-block"></span>
+          <span>เสาร์ - อาทิตย์</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-md border-2 border-red-500 inline-block"></span>
+          <span>Today (วันนี้)</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+          <span>มาทำงานครบ</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+          <span>มีคนลา / ขาด</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs uppercase pt-2">
+        <span class="weekend-col py-1.5 rounded-lg border border-amber-200">อา</span>
+        <span class="text-slate-500 py-1.5">จ</span>
+        <span class="text-slate-500 py-1.5">อ</span>
+        <span class="text-slate-500 py-1.5">พ</span>
+        <span class="text-slate-500 py-1.5">พฤ</span>
+        <span class="text-slate-500 py-1.5">ศ</span>
+        <span class="weekend-col py-1.5 rounded-lg border border-amber-200">ส</span>
+      </div>
+
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 text-center text-sm"></div>
+
+      <div class="pt-2 text-center">
+        <button onclick="goToToday()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-3 rounded-xl text-sm transition">
+          🎯 กระโดดกลับไป "วันปัจจุบัน (Today)"
+        </button>
+      </div>
+    </div>
+
+    <div class="p-3 bg-slate-50 border-t border-slate-200 text-center">
+      <span class="text-xs text-slate-400">เลือกวันที่เพื่อดูข้อมูลหรือวางแผนลาล่วงหน้า</span>
+    </div>
+  </aside>
+
+  <!-- ================= MODAL จัดการสมาชิก + AUTO MATCHING ================= -->
+  <div id="memberModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col relative">
+      
+      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+            <span>👥</span> จัดการรายชื่อสมาชิก
+          </h3>
+          <span class="text-xs text-slate-400 font-medium">ฐานข้อมูลพนักงาน Gateway: 502 ท่าน</span>
+        </div>
+        <button onclick="toggleMemberModal(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center transition">
+          ✕
+        </button>
+      </div>
+
+      <!-- ช่องค้นหา + Auto Matching -->
+      <div class="mt-4 relative">
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              id="newMemberName" 
+              placeholder="พิมพ์ชื่อ หรือ นามสกุลเพื่อค้นหา..." 
+              autocomplete="off"
+              oninput="handleAutoMatch(this.value)"
+              onfocus="handleAutoMatch(this.value)"
+              class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-base font-semibold outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            >
+          </div>
+          <button onclick="addNewMember()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-5 py-2.5 rounded-xl font-bold transition whitespace-nowrap shadow-sm">
+            + เพิ่ม
+          </button>
+        </div>
+
+        <!-- กล่อง Dropdown ผลการค้นหา -->
+        <div id="autoMatchBox" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-2xl z-30 max-h-64 overflow-y-auto divide-y divide-slate-100"></div>
+      </div>
+
+      <!-- รายชื่อปัจจุบันในทีม -->
+      <div class="mt-4 flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">สมาชิกในทีมปัจจุบัน (<span id="memberCountBadge">7</span> คน):</span>
+      </div>
+      <div class="mt-2 flex-1 overflow-y-auto space-y-2 pr-1" id="manageMemberList"></div>
+
+      <!-- ท้าย Modal -->
+      <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
+        <button onclick="resetDefaultMembers()" class="text-xs text-rose-600 hover:underline font-semibold">
+          รีเซ็ตเป็น 7 ท่านเริ่มต้น
+        </button>
+        <button onclick="toggleMemberModal(false)" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold transition">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="max-w-6xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- ฟอร์มบันทึกสถานะ -->
+    <div class="lg:col-span-6 bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <div>
+          <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-1.5">
+            <span>✍️</span> บันทึกสถานะ / วางแผนลา
+          </h2>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-sm font-bold text-indigo-600" id="formCurrentDate">15-Oct-2026</span>
+            <span id="advancePlanTag" class="hidden text-[11px] bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded-full font-bold">วางแผนล่วงหน้า</span>
+          </div>
+        </div>
+
+        <button onclick="setAllPresent()" class="text-sm bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-xl border border-emerald-200 active:scale-95 transition">
+          ✓ มาทุกคน
+        </button>
+      </div>
+
+      <div id="memberInputList" class="space-y-3"></div>
+
+      <div class="pt-2">
+        <button onclick="saveCurrentData()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-lg font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
+          <span>💾</span> บันทึกข้อมูลวันนี้ / แผนลา
+        </button>
+      </div>
+    </div>
+
+    <!-- ส่วน Preview Card + ปุ่มแชร์ LINE + Export JPEG -->
+    <div class="lg:col-span-6 flex flex-col gap-4">
+      <div id="reportCard" class="bg-white p-5 sm:p-6 rounded-3xl shadow-md border border-slate-200 text-slate-800">
+        <div class="border-b-2 border-slate-100 pb-3 mb-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] uppercase tracking-wider font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">
+                ES Quality GW#2
+              </span>
+              <h3 class="text-2xl font-black text-slate-900 mt-1">
+                สรุป Attendance ทีม
+              </h3>
+            </div>
+            <div class="text-right">
+              <span id="cardDate" class="text-base sm:text-lg font-bold text-slate-700 block">15-Oct-2026</span>
+              <span class="text-xs text-slate-400">ประจำวัน</span>
+            </div>
+          </div>
+
+          <div class="mt-3 bg-slate-50 rounded-2xl p-3 flex justify-around items-center border border-slate-200">
+            <div class="text-center">
+              <span class="text-xs text-slate-500 block font-medium">มาทำงาน</span>
+              <span id="statRatio" class="text-xl sm:text-2xl font-extrabold text-slate-800">6/7 คน</span>
+            </div>
+            <div class="w-px h-8 bg-slate-300"></div>
+            <div class="text-center">
+              <span class="text-xs text-slate-500 block font-medium">เปอร์เซ็นต์เข้างาน</span>
+              <span id="statPercent" class="text-xl sm:text-2xl font-extrabold text-emerald-600">85.7%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+            รายชื่อสมาชิกในทีม:
+          </span>
+          <ul id="previewList" class="space-y-2"></ul>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400">
+          <span>ES Quality GW#2</span>
+          <span>สร้างรายงานจาก Attendance System</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2.5">
+        <button onclick="shareTextToLine()" class="w-full bg-[#06C755] hover:bg-[#05b34c] active:scale-98 text-white text-lg font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2.5">
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 5.82 2 10.53c0 2.93 1.76 5.51 4.42 7.02-.19.68-.7 2.47-.8 2.84-.13.46.17.45.36.33.15-.09 2.06-1.39 2.91-1.97.36.05.73.08 1.11.08 5.52 0 10-3.82 10-8.53S17.52 2 12 2zm-4.7 11.23h-1.6c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5h1.6c.28 0 .5.22.5.5s-.22.5-.5.5H6.2v1.25h1.1c.28 0 .5.22.5.5s-.22.5-.5.5H6.2V12h1.1c.28 0 .5.22.5.5s-.22.5-.5.5zm2.85 0c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5s.5.22.5.5v4.5c0 .28-.22.5-.5.5zm4.8 0c-.16 0-.31-.08-.39-.21l-2.06-2.92v2.63c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4.5c0-.18.09-.34.25-.43.15-.08.34-.07.48.03l2.06 2.92v-2.55c0-.28.22-.5.5-.5s.5.22.5.5v4.5c0 .28-.22.5-.5.5zm3.15-3.5h-1.5v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5h2c.28 0 .5.22.5.5s-.22.5-.5.5h-1.5V9.5h1.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+          </svg>
+          ส่ง Report เข้า LINE
+        </button>
+
+        <button onclick="exportToJPEG()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-98 text-white text-base font-bold py-3 px-4 rounded-2xl shadow transition flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Export เป็นรูปภาพ JPEG
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= JAVASCRIPT ================= -->
+  <script>
+    // ฐานข้อมูลพนักงาน Gateway ครบทั้ง 502 ท่าน (ตัดคำนำหน้าออก 100%)
+    const MASTER_GATEWAY_NAMES = [
+      "ธีรยุทธ ชัยรถ", "ชัยวิชิตย์ ดอนหอมดี", "ภากร พิชญพรชัย", "ณัฐพล อสุณีย์", "กฤษสร ชาติศิริ", "สัญญา สุขสวัสดิ์",
+      "สุรชัย วิเชียรทอง", "วิรัตน์ รัตนราช", "ไพโรจน์ พึ่งเกษม", "บุญมี ตรีวิเศษ", "ไกรฤกษ์ แต่งทรัพย์", "จรัญ ผุดผ่องใส",
+      "อภิชาติ หล่อทรง", "เอนก โซ่เซียงคำ", "กิตติพงษ์ นาโควงค์", "นิคม หลอมหล่อ", "วิเชียร โสระถาวร", "ประยูร โนนยาง",
+      "มนตรี ธรรมศร", "จักราช พาเทพ", "ประนต เศษขุนทด", "เอกชัย อาษาธง", "พรรณา กองทน", "บุรินทร์ ศรสี",
+      "อนุชิต คล้ายแสงจันทร์", "ฉัตรชัย อุกวงษ์", "เชาวลิต สำราญกิจ", "อนันต์ ใหม่เอี่ยม", "ศิวนัฎ สมร", "กิตติพงษ์ จันทบุตร",
+      "เกียรติศักดิ์ กันประกอบ", "สมศักดิ์ หรั่งนรินทร์", "ไพศาล จันทรพิลา", "อรรถพล ดำริเลิศ", "ปรีดา นกทับ", "ประกิต พินิจค้า",
+      "ศักดิ์ชัย เล่าทอง", "วิสิทธิ์ ฉิมเกษ", "การัณย์ หมื่นหวัด", "วีรยุทธ ขุมทอง", "พัฒนา มะละ", "เกรียงศักดิ์ ศรีวิพันธุ์",
+      "พร้อมพงษ์ สังวรนิตย์", "ธงชัย พุฒทา", "วิระศักดิ์ เกิดศักดิ์", "นวพล คันทาเงิน", "นพพร ปรีชา", "มนเทียน วงค์อุดม",
+      "มณฑล เปลี่ยนเจริญ", "นรวิชญ์ ทัพมงคล", "ศักดิ์นรินทร์ ขาวอ่อน", "สมบัติ โฉมสอาด", "พัฒนะ อินทรกำแหง", "ประสิทธิ์ ราศรีมิน",
+      "สมพงษ์ คามภู", "อภิชัย เข็มเอี่ยม", "พรเทพ เสาทอง", "จามร อุบลอ่อน", "รันดร แป้นสุขา", "เมฆินทร์ ชาลี",
+      "สามารถ น้อยผล", "สมเกียรติ ยลมุกดา", "พิทยา โพธิ์หมุด", "ศิลา โตศิริ", "พูลศักดิ์ นนทการ", "วรานนท์ คำสุม",
+      "ประวิทย์ สุขถาวร", "ทวีป ต๊ะผัด", "สมใจ ทำสะอาด", "บำรุง เสงี่ยมจิต", "กิตติภพ กระจ่างจิต", "ตะวัน จิตรพล",
+      "ธนดล สมจิตร", "กฤษฎา เขียวอ่อน", "พารินทร์ รักษาทรัพย์", "สิทธิพงษ์ มลีรัตน์", "พิษณุ หินสุข", "วีระ ระวิโรจน์",
+      "เปรม ชำนาญกลาง", "สุเมธ ขอนพันธ์", "ถนอม ผ่องใส", "จาตุรงค์ มหารักษ์", "สมเกียรติ ค้าขึ้น", "ชาตรี กองทอง",
+      "ปิยะพงษ์ จำปี", "กิติศักดิ์ แสนจันทร์", "ศุภชัย นาคะ", "อาทร บุสภาค", "สิงหา บุญมา", "ศรรัก คำดี",
+      "วิวัฒน์ ปัสสาทิพย์", "กำพลศักดิ์ สิวกระโทก", "ภาณุพงศ์ นพชัย", "ราชัน เสาวกุล", "พยอม ผ่องแผ้ว", "วิทพงษ์ มณีบุญ",
+      "จามร ก๋งซัง", "ศรุต ลางหล้า", "ชัยพฤกษ์ มูลมิรัตน์", "ประกอบ สโรบล", "ธีระวัฒน์ นาคจู", "นิจ สวัสดี",
+      "สุธี เสาวรักษ์", "บุญมั่น นิรารมย์", "มานพ คะรุรัมย์", "สมภพ เกลือสีโท", "สมนึก แก้วใส", "เฉลิมชาติ นวลสุวรรณ์",
+      "วีรวุฒิ พรหมารักษา", "อภิสิทธิ์ แสงจันทร์", "ประสาน คนรู้", "ยรรยง เพียรุ้ย", "จักรกฤษ มังสา", "วันชัย ไชยะ",
+      "ทองยุ่น อุปชัย", "สุนันท์ พลเยี่ยม", "พงษ์ศักดิ์ ศิริปราการ", "สนั่น โพธิ์หมุด", "พิษณุ ยอดพังเทียม", "วัชระ ทองมา",
+      "ประเชิญ ดวงดาว", "อ๊อด พิมพิลา", "มนตรี ใหม่โสภา", "พิศาล แว่นแก้ว", "ไพรินทร์ เกษรสร้อย", "คำสอน เวียงชัย",
+      "ชุมพล แดงกูล", "สมศักดิ์ ดวงศรีทอง", "สิรวิชญ์ ไกรสอน", "บรรหาญ เข็มมลฑา", "สุพจน์ กั้นกลาง", "ธวัช แท่นทอง",
+      "วัลลภ โยดิน", "มณี แก้วปรัง", "ดิษฐวัฒน์ เจริญศรี", "สมฤทธิ์ จันทร์แรม", "ไกรศร คำหมู", "เอนก จันดากร",
+      "ศิลธรรม เผิงผา", "พนมพร พันโบ", "สุวิธ สมคะเณย์", "วิชิต ตรีเนตร์", "รุ่งโรจน์ ยลมุกดา", "สมบูรณ์ สุ่มมาตย์",
+      "วิโรจน์ ฉิมทัด", "ศราวุธ ศรีสาร", "สุขดำรง จั้นพลแสน", "สายชล คำผอง", "เสนอ นาคเจือ", "วิชิต มหามาต",
+      "นำชัย คงเกิดลาภ", "ฉัตรมงคล สุขสุด", "สุริยา สุทา", "องอาจ อ่อนวันสี", "วิโรจน์ หวังประสพกลาง", "สุพจน์ วรรณจันทร์",
+      "วาสุเทพ มังสา", "วันชัย ทองสีสุข", "พิทักษ์ ไร่วิชัย", "อดิศร ทั่งถิ่น", "นพคุณ สอดทรัพย์", "เฉลิมชัย ใหม่เกตุ",
+      "สุรชัย แพงวัน", "เอกลักษณ์ ไข่สนอง", "พงษ์ธร ชิตเจริญ", "สราวุธ ดังกระโทก", "สมโภชน์ หมายปิดกลาง", "สันติ ไชเลี้ยว",
+      "สุรินทร์ พงษ์ชะอุ่มดี", "ราชนิเวศ สุดสังข์", "พงษ์พิพัฒน์ โกพระ", "พิทักษ์ วาโยพัด", "รัศมี ปัดถามัง", "สมจิตย์ สมภาร",
+      "วิโรจน์ เดชโชค", "พรชัย ศรีษะธาตุ", "นพธนันท์ ยังสุข", "สวัสดิ์ ทุยสุวรรณ", "สุรศักดิ์ วิเชียรทอง", "สลักจิต ทองอยู่แบบ",
+      "อาทิตย์ เพียรุ้ย", "เอกชัย ทิพวรรณ", "วัลลพ ตาพรม", "เทวฤทธิ์ พรมชาติ", "โชติชัย ศรียศราช", "นิพนธ์ เครือแดง",
+      "ทวีลาภ โพธิ์ศรี", "สมพร เมืองจันทร์", "วรชัย สมปอง", "เจตน์ชริณ ยะหลง", "ราเมศ ไม้จันทร์ดี", "มนัสชัย ค่ายมั่น",
+      "เลิดศักดิ์ อนุทวงษ์", "เอกนรินทร์ มาประจวบ", "สมเกียรติ คงเหลา", "ไผ่ ทองสุข", "จีรศักดิ์ หวังดี", "กนกชัย ย้อยแสง",
+      "รังสรรค์ นันทวัฒน์", "ธีระพงษ์ แก้วกำเหนิด", "ศราวุธ รายพิมาย", "มงคล วงศ์สุวรรณ", "วัลลภ ตัญญะสิทธิ์", "เฉลิมวุฒิ มาตย์งามเมือง",
+      "คมสันต์ พนารินทร์", "อนุสิทธิ์ แซ่ลิ้ม", "บัญเจิด ปลอดทอด", "อิทธิพร ลีลายุทธ์โท", "จิระเดช แก้วคำ", "อรรถพล โมรา",
+      "นิดธิชัย โพธิ์ศรี", "ชัยวัฒน์ จันเพชร", "สุรัตน์ ดวงศรี", "สุประชา กุลรัตน์", "ยุทธนา ศรียำ", "ชาญณรงค์ สุวรรณิกา",
+      "วีระชล แสงจันทร์", "วิโรจน์ ทองเฟื่อง", "ชัยญวัฒน์ ผดาวงค์", "อภินันท์ นาคนวล", "ณัฐพงษ์ ดงพระจันทร์", "ไพบูลย์ แก้วไกรจักร์",
+      "มานพ งามเลิศ", "ดอน แก้วดอนลี", "สุนทร ฝ่ายประสิทธิ์", "วีระศักดิ์ มณีสาร", "วะชิระ ประภาเวสัง", "อนุ สอนนา",
+      "พิศนุ แซ่เตียว", "ชาตรี เปนุจา", "ชัยยุทธ อรุณ", "นพดล จันทรส", "เกษมพันธุ์ โฉมศรี", "สุเบ็ญ หยิบเหมาะ",
+      "ชนินทร์ เพ็งแจ่ม", "เจด็จ รัตนคุณ", "ยุทธนา ธรรมบุตร", "ชัยสิทธิ์ แสนสวาท", "แสงสุรีย์ แก้วกูล", "ปรัชญา นพสมบูรณ์",
+      "โอเล่ย์ สุริวงษ์", "โชวี พิสูจน์พงษ์ไพร", "อุทาน บุตรสาลี", "เอกนรินทร์ รู้ทำนอง", "สมยศ วรสาร", "สงกรานต์ พลโยธา",
+      "ธวัชชัย วันดี", "อัตพร จันทร์เจ้า", "ไตรรงค์ ยุภา", "สาธิต พิมพ์ทอง", "ธรรมนูญ สวดประโคน", "อธิวัฒน์ ขวัญวงษทิม",
+      "วิทยา คำดี", "พงษ์ศักดิ์ แสนขวา", "สมชาย บุญเพ็ง", "พงษ์ศิริ แก้วสวัสดิ์", "วิษณุ มณฑา", "ศิรวิทย์ จันทวัฒน์",
+      "ทิพากร วิระคร", "อนุชา พรมทอง", "สิทธิพงษ์ สังข์สำราญสกุล", "สมชาย แก่นอินทร์", "สายชล ชุ่มชื่น", "พิภพ ไทยสมัคร",
+      "เจตณรงค์ ทูคำมี", "วัฒนา ชานอก", "สมชัย ผาวันดี", "สมศักดิ์ หล่อทรง", "บรรจง คำเรือง", "มงคล สังวาลย์",
+      "ปรีชา ชัญถาวร", "อำนาจ พุดดี", "มนูญ พรมพิทักษ์", "มงคล อัคฮาดศรี", "วชิรศักดิ์ บุญเถื่อน", "กิตติศักดิ์ บุญกลึง",
+      "สุรสิทธิ์ ตัญญะสิทธิ์", "พิภพ ประเสริฐโสภณ", "สดใส ผางดี", "สุรพล รองศักดิ์", "ไชยา ภาระเวช", "ปัญญา ยังสุข",
+      "ปิยบุตร เปจิตตัง", "กมล ทรัพย์สุข", "ขจรศักดิ์ บุญเรือง", "เจนศักดิ์ บุญมา", "ศักดิ์ดา แก้วปัญญา", "สุนทร โพพิทูล",
+      "พิเชษฐ์ ชุ่มกลาง", "พิชิต นิลสุวรรณ์", "นพดล เกิดทอง", "ชรินทร์ เย็นบำรุง", "กฤษณะ เตียงกูล", "สุรศิษฏ์ เทพมงคล",
+      "มนัส คะเชนเนียม", "สากล ศรีแก้วนิตย์", "สราวุฒิ พุทธา", "ไพรวรรณ หอมหวล", "บัณฑิต พรมมา", "สาคร ศรีสุวรรณ",
+      "ประพันธ์ ขุนชาลี", "สมปอง เจือจันทึก", "สุรศักดิ์ คล่องชัยภูมิ", "วารินทร์ ยะรังษี", "เชาวรัตน์ ยิ้มศิริ", "บำรุง ดาวดี",
+      "ประกรีต จุกสีดา", "ชัยญา ทิพพรม", "สมพงศ์ พรหมนิทัศน์", "สมชาย เชาวน์ดี", "อัด แสร์ผักแว่น", "อดุลย์ เนาแสง",
+      "สมชาย จงกล", "นพอนันต์ โสฬสประเสริฐ", "ธิติพงศ์ ปะแปง", "ไพฑูรย์ หาสุข", "ชัยณัท แคนติ", "อำพล วงษา",
+      "ภูเขตต์ ศรีสิงห์", "สุภชัย นาอุดม", "พิชิต คะเลรัมย์", "สุนทร พิลาวุฒิ", "ก้องกาศ ดอนปัด", "พิชัย ทำเนาว์",
+      "ณรงค์ สมัครผล", "ธวัตร์ เพ็งบุบผา", "นิกร พรจำศิลป์", "ศรายุทธ แพทย์พิพัฒน์", "ภิญโญ พ่วงเนตร", "บุญเพ็ง สิทธิการ",
+      "สุรเชษฐ์ วงษ์จันทร์ดี", "ปริญญา คำศิริ", "นิธิ ดีชุม", "สมปราชญ์ ศรีพิมาย", "ยุทธนา เนื่องยา", "อาทิตย์ ดียางหวาย",
+      "ปรีชา สุระเสียง", "บรรเจิด ยะเขตรกรณ์", "มงคล ภัทรศิริพงษ์ชัย", "สมาน สารมะโน", "สุริยัญ บัวใหญ่", "ธนาวุฒิ ทิพยานนท์",
+      "กฤษณะ อุดทุม", "พานทอง พรมโยธา", "เสวต วิจิตรเชื้อ", "สุชาติ จตุพรรุ่งเรือง", "นคร ชัยสิทธิ์", "สมเกียรติ คำมาปัน",
+      "ราเชนทร์ พิรารมย์", "ประยูร ประฮาดไชย", "สาคร ทวีโชติ", "วิทยา แก้วเนี้ยว", "เสน่ห์ คะประเวศ", "พีรเทพ ดีแก้ว",
+      "วิชัย วิหคเหิร", "มาโนช พรมโสภา", "ประสิทธิ์ พลเรือง", "ณัฐธวัช รุณเกตุ", "เด่นชาย กระสังข์", "ทำนอง กังทอง",
+      "พงศ์นรินทร์ แก้วศิริ", "เกียรติบัณฑิต สาทิพย์จันทร์", "วัฒนา นุชเฉย", "ประยงค์ ศรีอยู่เดิม", "อภิมลธวัช การินทร์", "มานิตย์ สมบัติดี",
+      "ภูวนัย ทองช้อย", "วีระยุทธ จิตรทรัพย์", "ไพฑูรย์ ผิวผัน", "ธวัฒณ์ ภูมิคอนสาร", "ธีรพงษ์ วงษา", "เยี่ยม โพธิ์เงิน",
+      "ปิยะพงษ์ ทองรักษ์", "จตุพล รักษาพล", "วีระพงษ์ ดวงแวว", "สมประสงค์ สิงห์สมุทร", "จักราวุธ จักรกุล", "อัษฎา เพชรคง",
+      "สุคนธ์ สุริแสง", "ไกรสร แก้วคำ", "จักริน ประมวล", "สมพร ปู่พะบุญ", "ประกอบ ประมูลจักกา", "วันชัย ไร่เกื้อ",
+      "นพดล มานันชัย", "จักรกฤช นาดี", "นัธทวัฒน์ โคกม่วง", "วิลัย ยังภาย", "วิรัตน์ แซ่บุ้น", "ไชยราช สมวงษ์",
+      "จารึก วงสา", "สุชาติ พรมโชติ", "ยุทธนา แววเพชร", "ศุภกร แพงศรี", "ถาวร มนัสสา", "ดำรงชัย สีปัชชา",
+      "มนตรี เพิ่มมี", "สุรชัย แดงเจริญ", "อุดร สุจิตร์", "อนุสรณ์ ลาภาพันธ์", "เฉลิม นาคสุข", "สมัย เสาะสมบูรณ์",
+      "อานนท์ สนองคุณ", "ภานุพงษ์ สติภา", "ชายชาญ แสงทวี", "ปฏิภาณ ปัตตาโพธิ์", "สมคิด ผาสุข", "เอกรินทร์ กรมวันดี",
+      "ธงชัย กิจวัฒน์", "สกล อารีย์จันทวัฒน์", "อนันต์ เสน่หา", "สุภิชาติ มฤค", "สุรชาติ กริชคม", "สมศักดิ์ เชิดสันเทียะ",
+      "นิพิษฐ์ สุนทรเบ้า", "พนาวัลย์ ปั้นประเสริฐ", "ณัฐวรรธน์ สกุลวัชรชัย", "สุพรรณ พรมลิ", "สิทธิชัย หนึ่งคำมี", "สมพงษ์ ข้องนอก",
+      "วีระพงษ์ ทามแก้ว", "นิรุตต์ โพนพันนา", "อนุสรณ์ จูมวงษ์", "วิศรุต ลาสแดง", "สมโภชน์ ไชยสุระ", "เรืองวุธ พิเภก",
+      "อานนท์ กลิ่นเกษร", "รัตนพงษ์ หอมวงษ์", "วีระชัย หล้าพรหม", "ภูตะวัน มะมูฮำหมัด", "อภินันท์ ภิระบัน", "วรภัทร คำทองวิจิตร",
+      "บุญสม ไตรจิตร", "ธวัชชัย ทองศรี", "จำลอง อนันต์ตึก", "มานิตย์ เณรมา", "สรพงษ์ สังข์เถื่อน", "เอนก ศรีกุลคร",
+      "จารุวัฒน์ คำบุดดี", "ศิรโชติ โชติฤทธิยกร", "วิชัย ศรีวันทา", "สมพงศ์ เพชรคง", "ปุญญพัฒน์ บุญส่ง", "วีระ มาตย์นอก",
+      "ชัยยะ ยาแก้ว", "วิเชียร พิศเพ็ง", "สมพร อวยชัย", "ปัณณทัต คเชนทร", "ถาวร หอมคำ", "พรเทพ ทองภูบาล",
+      "ธีระพงษ์ ทองภูบาล", "อำนวย กุ่มงาม", "วรชัย ทองอยู่", "บุรพล ศรีบุตรตา", "วิชาญ พรมเจริญสุข", "ฐิติศักดิ์ ศรีบุตรตา",
+      "เมธี ศิริวรา", "จะเด็ด อินทร์เจริญ", "ธนพล พลลาภ", "สมศักดิ์ อินประเสริฐ", "นพดล แสนสึก", "สุวิทย์ ป่าคา",
+      "ชัยพร แท่นแก้ว", "กนกศิลป์ ปงคำ", "พิรุณ พรมสอน", "อุดม ทรัพย์อาสา", "เชาวลิต ขวัญดี", "ยอดศักดิ์ นพศิริ",
+      "ปฏิภาณ มิตรโกสุม", "เฉลิมพล แสนไชย", "ชุมพล บุรีลักษ์นารากร", "สันทัศ ใจศิริ", "พงศ์รัตน์ ติโลกวิชัยพร", "สมศักดิ์ ศรีแพงมล",
+      "สายัณห์ ตันนพรัตน์", "กุศล ทองอ่อน", "สุรศักดิ์ สินสอาด", "สนิท ปองตา", "เอกศาสตร์ จำปาสิม", "วัชรายุทธ คำด้วง",
+      "สุวิตร ทองปั้น", "พิบูลย์ ทีคำ", "ปรานต์ รังสิน", "เศวต มาน้อย", "อภิเชษฐ์ ศิริขันธุ์", "กัญญมน ฉ่ำน้อย",
+      "ยมราช บงแก้ว", "สมศักดิ์ ศิริเวช", "ทีรยุทธ์ มาโพนงาม", "วิสิทธิ์ สนสี", "นราทัศน์ จันทร์เพ็ชร", "ชาญยุทธ ชัยผง",
+      "นิติพงค์ ประทุมคำ", "ธีรวีร์ ไกรวุฒิกิติพงษ์", "ชีวรัตน์ พิริยาสัยสันติ", "นพดล สุกคารัก", "นัฐพงษ์ เสาทอง", "ณัฏฐนันท์ น้อยจินดา",
+      "นนทพัทธ์ พากล้า", "สุรกมล แซ่ลี้", "อนวัฒน์ ดุลยกาญจน์", "ปวัน โรจน์ยินดีเลิศ"
+    ];
+
+    // รายชื่อเริ่มต้นของทีม 7 ท่าน
+    const DEFAULT_MEMBERS = [
+      "พิบูลย์ ทีคำ",
+      "สันทัศ ใจศิริ",
+      "พีรเทพ ดีแก้ว",
+      "พงษ์ศิริ แก้วสวัสดิ์",
+      "เศวต มาน้อย",
+      "อภิเชษฐ์ ศิริขันธุ์",
+      "วีระพงษ์ ทามแก้ว"
+    ];
+
+    function getMembers() {
+      const stored = localStorage.getItem("attendance_gw2_members");
+      return stored ? JSON.parse(stored) : DEFAULT_MEMBERS;
+    }
+
+    function saveMembers(list) {
+      localStorage.setItem("attendance_gw2_members", JSON.stringify(list));
+    }
+
+    const BASE_STATUS_OPTIONS = [
+      { id: "PRESENT", label: "มาทำงาน", isLeave: false, needHours: false },
+      { id: "VACATION_FULL", label: "ลาพักร้อน เต็มวัน", isLeave: true, needHours: false },
+      { id: "VACATION_HALF", label: "ลาพักร้อน ครึ่งวัน", isLeave: true, needHours: false },
+      { id: "VACATION_HR", label: "ลาพักร้อน (ระบุ ชม.)", isLeave: true, needHours: true, prefix: "ลาพักร้อน" },
+      { id: "BUSINESS_HR", label: "ลากิจ (ระบุ ชม.)", isLeave: true, needHours: true, prefix: "ลากิจ" },
+      { id: "SICK_HR", label: "ลาป่วย (ระบุ ชม.)", isLeave: true, needHours: true, prefix: "ลาป่วย" },
+      { id: "ABSENT", label: "ขาดงาน", isLeave: true, needHours: false }
+    ];
+
+    const DEFAULT_DATE = "2026-10-15";
+    let activeDate = DEFAULT_DATE;
+
+    const realToday = new Date().toISOString().split("T")[0];
+    const todayObj = new Date();
+    let calendarMonth = 9; // October 2026
+    let calendarYear = 2026;
+
+    const SEED_DATA = {
+      [DEFAULT_DATE]: {
+        "พิบูลย์ ทีคำ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+        "สันทัศ ใจศิริ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+        "พีรเทพ ดีแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+        "พงษ์ศิริ แก้วสวัสดิ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+        "เศวต มาน้อย": { type: "VACATION_FULL", hours: 0, text: "ลาพักร้อน เต็มวัน" },
+        "อภิเชษฐ์ ศิริขันธุ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+        "วีระพงษ์ ทามแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" }
+      }
+    };
+
+    function getDB() {
+      const db = localStorage.getItem("attendance_gw2_db");
+      return db ? JSON.parse(db) : {};
+    }
+
+    function saveDB(data) {
+      localStorage.setItem("attendance_gw2_db", JSON.stringify(data));
+    }
+
+    function formatDisplayDate(dateStr) {
+      const [y, m, d] = dateStr.split("-");
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${parseInt(d, 10)}-${months[parseInt(m, 10) - 1]}-${y}`;
+    }
+
+    function initSeedData() {
+      const db = getDB();
+      if (!db[DEFAULT_DATE]) {
+        db[DEFAULT_DATE] = SEED_DATA[DEFAULT_DATE];
+        saveDB(db);
+      }
+      if (!localStorage.getItem("attendance_gw2_members")) {
+        saveMembers(DEFAULT_MEMBERS);
+      }
+    }
+
+    // ================= ระบบ AUTO MATCHING ปรับปรุงความแม่นยำสูง =================
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function handleAutoMatch(query) {
+      const box = document.getElementById("autoMatchBox");
+      let cleanQ = query.trim();
+
+      // ตัดคำนำหน้าออกอัตโนมัติหากผู้ใช้เผลอพิมพ์
+      ['ว่าที่ร.ต.', 'ว่าที่ ร.ต.', 'น.ส.', 'นางสาว', 'นาง', 'นาย'].forEach(p => {
+        if (cleanQ.startsWith(p)) {
+          cleanQ = cleanQ.substring(p.length).trim();
+        }
+      });
+
+      if (!cleanQ) {
+        box.classList.add("hidden");
+        box.innerHTML = "";
+        return;
+      }
+
+      // แยกคำค้นหาตามช่องว่าง รองรับการพิมพ์ชื่อหรือนามสกุลก่อน-หลัง
+      const searchWords = cleanQ.split(/\s+/).filter(w => w.length > 0);
+
+      const matches = MASTER_GATEWAY_NAMES.filter(fullName => {
+        const lowerName = fullName.toLowerCase();
+        return searchWords.every(word => lowerName.includes(word.toLowerCase()));
+      });
+
+      box.innerHTML = "";
+
+      if (matches.length === 0) {
+        box.innerHTML = `
+          <div class="p-3.5 text-xs text-slate-400 text-center">
+            ไม่พบชื่อในฐานข้อมูลเกตเวย์ (คุณสามารถพิมพ์ชื่อเองแล้วกด <b>+ เพิ่ม</b> ได้ทันที)
+          </div>
+        `;
+        box.classList.remove("hidden");
+        return;
+      }
+
+      const header = document.createElement("div");
+      header.className = "px-3 py-1.5 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center border-b border-slate-100";
+      header.innerHTML = `<span>พบ ${matches.length} รายชื่อ</span><span>แตะเพื่อเลือก</span>`;
+      box.appendChild(header);
+
+      matches.slice(0, 25).forEach(name => {
+        const item = document.createElement("div");
+        item.className = "px-4 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 cursor-pointer flex justify-between items-center transition border-b border-slate-100 last:border-none";
+        
+        // ไฮไลต์คำที่ตรงกัน
+        let highlighted = name;
+        searchWords.forEach(w => {
+          try {
+            const reg = new RegExp(`(${escapeRegExp(w)})`, "gi");
+            highlighted = highlighted.replace(reg, `<span class="text-indigo-600 font-extrabold bg-indigo-50 px-0.5 rounded">$1</span>`);
+          } catch(e) {}
+        });
+
+        item.innerHTML = `
+          <span class="text-sm font-bold text-slate-700">${highlighted}</span>
+          <span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">+ เลือก</span>
+        `;
+
+        item.addEventListener("click", () => {
+          selectMatchedName(name);
+        });
+
+        box.appendChild(item);
+      });
+
+      box.classList.remove("hidden");
+    }
+
+    function selectMatchedName(name) {
+      const input = document.getElementById("newMemberName");
+      input.value = name;
+      document.getElementById("autoMatchBox").classList.add("hidden");
+      input.focus();
+    }
+
+    document.addEventListener("click", (e) => {
+      const box = document.getElementById("autoMatchBox");
+      const input = document.getElementById("newMemberName");
+      if (box && !box.contains(e.target) && e.target !== input) {
+        box.classList.add("hidden");
+      }
+    });
+
+    // Modal จัดการสมาชิก
+    function toggleMemberModal(open) {
+      const modal = document.getElementById("memberModal");
+      if (open) {
+        renderManageMemberList();
+        modal.classList.remove("opacity-0", "pointer-events-none");
+        modal.classList.add("opacity-100", "pointer-events-auto");
+      } else {
+        modal.classList.add("opacity-0", "pointer-events-none");
+        modal.classList.remove("opacity-100", "pointer-events-auto");
+        document.getElementById("autoMatchBox").classList.add("hidden");
+      }
+    }
+
+    function renderManageMemberList() {
+      const members = getMembers();
+      const list = document.getElementById("manageMemberList");
+      const badge = document.getElementById("memberCountBadge");
+      if (badge) badge.innerText = members.length;
+      list.innerHTML = "";
+
+      members.forEach((m, idx) => {
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200";
+        div.innerHTML = `
+          <span class="font-bold text-slate-700 text-sm">${idx + 1}. ${m}</span>
+          <button onclick="removeMember(${idx})" class="text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-rose-200 transition">
+            ลบ
+          </button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addNewMember() {
+      const input = document.getElementById("newMemberName");
+      let name = input.value.trim();
+      
+      ['ว่าที่ร.ต.', 'ว่าที่ ร.ต.', 'น.ส.', 'นางสาว', 'นาง', 'นาย'].forEach(p => {
+        if (name.startsWith(p)) {
+          name = name.substring(p.length).trim();
+        }
+      });
+
+      if (!name) return;
+
+      const members = getMembers();
+      if (members.includes(name)) {
+        alert("มีชื่อนี้อยู่ในรายชื่อทีมแล้วครับ");
+        return;
+      }
+
+      members.push(name);
+      saveMembers(members);
+      input.value = "";
+      document.getElementById("autoMatchBox").classList.add("hidden");
+      renderManageMemberList();
+      selectDate(activeDate);
+    }
+
+    function removeMember(idx) {
+      const members = getMembers();
+      const targetName = members[idx];
+      if (confirm(`คุณต้องการลบชื่อ "${targetName}" ออกจากทีมใช่หรือไม่?`)) {
+        members.splice(idx, 1);
+        saveMembers(members);
+        renderManageMemberList();
+        selectDate(activeDate);
+      }
+    }
+
+    function resetDefaultMembers() {
+      if (confirm("ต้องการรีเซ็ตกลับเป็นรายชื่อเริ่มต้น 7 ท่านใช่หรือไม่?")) {
+        saveMembers(DEFAULT_MEMBERS);
+        renderManageMemberList();
+        selectDate(activeDate);
+      }
+    }
+
+    function toggleSidebar(open) {
+      const drawer = document.getElementById("calendarDrawer");
+      const overlay = document.getElementById("drawerOverlay");
+      if (open) {
+        drawer.classList.remove("-translate-x-full");
+        overlay.classList.remove("opacity-0", "pointer-events-none");
+        overlay.classList.add("opacity-100", "pointer-events-auto");
+      } else {
+        drawer.classList.add("-translate-x-full");
+        overlay.classList.add("opacity-0", "pointer-events-none");
+        overlay.classList.remove("opacity-100", "pointer-events-auto");
+      }
+    }
+
+    function goToToday() {
+      calendarMonth = todayObj.getMonth();
+      calendarYear = todayObj.getFullYear();
+      selectDate(realToday);
+      toggleSidebar(false);
+    }
+
+    function renderInputForm(records) {
+      const container = document.getElementById("memberInputList");
+      container.innerHTML = "";
+
+      const members = getMembers();
+      const isAdvance = activeDate > realToday;
+      const advanceTag = document.getElementById("advancePlanTag");
+      if (isAdvance) {
+        advanceTag.classList.remove("hidden");
+      } else {
+        advanceTag.classList.add("hidden");
+      }
+
+      members.forEach((member, idx) => {
+        const item = records[member] || { type: "PRESENT", hours: 1, text: "มาทำงาน" };
+        const div = document.createElement("div");
+        div.className = "p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-2";
+
+        const currentType = item.type || "PRESENT";
+        const currentHours = item.hours || 1;
+        const config = BASE_STATUS_OPTIONS.find(o => o.id === currentType) || BASE_STATUS_OPTIONS[0];
+
+        div.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-slate-800 text-base">${idx + 1}. ${member}</span>
+            <span id="badge_${idx}" class="text-xs px-2 py-0.5 rounded font-bold ${config.isLeave ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+              ${config.isLeave ? 'ลา/ไม่มา' : 'มาทำงาน'}
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="type_${idx}" onchange="onStatusChange(${idx})" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+              ${BASE_STATUS_OPTIONS.map(opt => `
+                <option value="${opt.id}" ${opt.id === currentType ? "selected" : ""}>${opt.label}</option>
+              `).join("")}
+            </select>
+            
+            <div id="hourWrapper_${idx}" class="${config.needHours ? 'flex' : 'hidden'} items-center gap-1 min-w-[100px]">
+              <select id="hours_${idx}" onchange="updateLivePreview()" class="w-full bg-white border border-slate-300 rounded-xl px-2 py-2 text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                ${[1,2,3,4,5,6,7].map(h => `
+                  <option value="${h}" ${h === Number(currentHours) ? "selected" : ""}>${h} ชม.</option>
+                `).join("")}
+              </select>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function onStatusChange(idx) {
+      const typeSelect = document.getElementById(`type_${idx}`);
+      const hourWrapper = document.getElementById(`hourWrapper_${idx}`);
+      const typeVal = typeSelect.value;
+      const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal);
+
+      if (config.needHours) {
+        hourWrapper.classList.remove("hidden");
+        hourWrapper.classList.add("flex");
+      } else {
+        hourWrapper.classList.add("hidden");
+        hourWrapper.classList.remove("flex");
+      }
+
+      const badge = document.getElementById(`badge_${idx}`);
+      if (config.isLeave) {
+        badge.className = "text-xs px-2 py-0.5 rounded font-bold bg-red-100 text-red-700";
+        badge.innerText = "ลา/ไม่มา";
+      } else {
+        badge.className = "text-xs px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-700";
+        badge.innerText = "มาทำงาน";
+      }
+
+      updateLivePreview();
+    }
+
+    function updateLivePreview() {
+      const previewList = document.getElementById("previewList");
+      previewList.innerHTML = "";
+
+      const members = getMembers();
+      let presentCount = 0;
+      const totalCount = members.length;
+
+      members.forEach((member, idx) => {
+        const typeElem = document.getElementById(`type_${idx}`);
+        const hourElem = document.getElementById(`hours_${idx}`);
+
+        if (!typeElem) return;
+
+        const typeVal = typeElem.value;
+        const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
+        let statusText = config.label;
+
+        if (config.needHours) {
+          const hrs = hourElem ? hourElem.value : 1;
+          statusText = `${config.prefix} ${hrs} ชม.`;
+        }
+
+        const isLeave = config.isLeave;
+        if (!isLeave) {
+          presentCount++;
+        }
+
+        const li = document.createElement("li");
+        li.className = `p-2.5 sm:p-3 rounded-2xl border transition flex justify-between items-center ${
+          isLeave 
+            ? 'bg-rose-100/90 border-rose-400 text-rose-950 shadow-sm ring-1 ring-rose-300' 
+            : 'bg-white border-slate-200 text-slate-800'
+        }`;
+
+        li.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full ${isLeave ? 'bg-rose-600 animate-pulse' : 'bg-emerald-500'}"></span>
+            <span class="font-bold text-base sm:text-lg ${isLeave ? 'text-rose-950 font-black' : 'text-slate-800'}">
+              ${idx + 1}. ${member}
+            </span>
+          </div>
+          <span class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-bold border ${
+            isLeave 
+              ? 'bg-rose-600 text-white border-rose-600 shadow' 
+              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          }">
+            ${statusText}
+          </span>
+        `;
+        previewList.appendChild(li);
+      });
+
+      const percent = totalCount > 0 ? ((presentCount / totalCount) * 100).toFixed(1) : 0;
+      document.getElementById("statRatio").innerText = `${presentCount}/${totalCount} คน`;
+      document.getElementById("statPercent").innerText = `${percent}%`;
+
+      const formatted = formatDisplayDate(activeDate);
+      document.getElementById("cardDate").innerText = formatted;
+      document.getElementById("formCurrentDate").innerText = formatted;
+      document.getElementById("activeDateNavbar").innerText = formatted;
+    }
+
+    function setAllPresent() {
+      const members = getMembers();
+      members.forEach((_, idx) => {
+        const typeSelect = document.getElementById(`type_${idx}`);
+        if (typeSelect) {
+          typeSelect.value = "PRESENT";
+          onStatusChange(idx);
+        }
+      });
+      updateLivePreview();
+    }
+
+    function saveCurrentData() {
+      const db = getDB();
+      const records = {};
+      const members = getMembers();
+
+      members.forEach((member, idx) => {
+        const typeElem = document.getElementById(`type_${idx}`);
+        if (!typeElem) return;
+
+        const typeVal = typeElem.value;
+        const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal);
+        const hours = config.needHours ? parseInt(document.getElementById(`hours_${idx}`).value, 10) : 0;
+        
+        let text = config.label;
+        if (config.needHours) {
+          text = `${config.prefix} ${hours} ชั่วโมง`;
+        }
+
+        records[member] = {
+          type: typeVal,
+          hours: hours,
+          text: text
+        };
+      });
+
+      db[activeDate] = records;
+      saveDB(db);
+      renderCalendar();
+      alert(`✅ บันทึกข้อมูลวันที่ ${formatDisplayDate(activeDate)} เรียบร้อย!`);
+    }
+
+    function selectDate(dateStr) {
+      activeDate = dateStr;
+      const db = getDB();
+      const records = db[dateStr] || {};
+      renderInputForm(records);
+      updateLivePreview();
+      renderCalendar();
+    }
+
+    function changeMonth(direction) {
+      calendarMonth += direction;
+      if (calendarMonth < 0) {
+        calendarMonth = 11;
+        calendarYear--;
+      } else if (calendarMonth > 11) {
+        calendarMonth = 0;
+        calendarYear++;
+      }
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      document.getElementById("calendarMonthYear").innerText = `${monthNames[calendarMonth]} ${calendarYear}`;
+
+      const grid = document.getElementById("calendarGrid");
+      grid.innerHTML = "";
+
+      const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
+      const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+      const db = getDB();
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.className = "h-11";
+        grid.appendChild(emptyCell);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayStr = String(d).padStart(2, "0");
+        const monthStr = String(calendarMonth + 1).padStart(2, "0");
+        const fullDate = `${calendarYear}-${monthStr}-${dayStr}`;
+
+        const dayOfWeek = new Date(calendarYear, calendarMonth, d).getDay();
+        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+        const isToday = (fullDate === realToday);
+        const isSelected = (fullDate === activeDate);
+        const hasRecord = !!db[fullDate];
+
+        let hasLeave = false;
+        if (hasRecord) {
+          const rec = db[fullDate];
+          for (let m in rec) {
+            const t = rec[m].type;
+            const cfg = BASE_STATUS_OPTIONS.find(o => o.id === t);
+            if (cfg && cfg.isLeave) {
+              hasLeave = true;
+              break;
+            }
+          }
+        }
+
+        const btn = document.createElement("button");
+        btn.onclick = () => {
+          selectDate(fullDate);
+          toggleSidebar(false);
+        };
+
+        let statusDot = "";
+        if (hasRecord) {
+          statusDot = hasLeave 
+            ? `<span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>`
+            : `<span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>`;
+        }
+
+        let customClasses = "";
+        if (isSelected) {
+          customClasses = "bg-indigo-600 text-white font-extrabold shadow-md ring-2 ring-indigo-400";
+        } else if (isWeekend) {
+          customClasses = "weekend-col border border-amber-200/80 font-bold hover:bg-amber-200";
+        } else {
+          customClasses = "bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200/70";
+        }
+
+        if (isToday && !isSelected) {
+          customClasses += " today-marker";
+        }
+
+        btn.className = `h-11 rounded-xl flex flex-col items-center justify-center font-bold text-sm transition ${customClasses}`;
+        btn.innerHTML = `
+          <span>${d}</span>
+          <div class="h-2 flex items-center justify-center">${statusDot}</div>
+        `;
+
+        grid.appendChild(btn);
+      }
+    }
+
+    function shareTextToLine() {
+      const selectedFormatted = formatDisplayDate(activeDate);
+      const statRatio = document.getElementById("statRatio").innerText;
+      const statPercent = document.getElementById("statPercent").innerText;
+
+      const presentList = [];
+      const leaveList = [];
+      const members = getMembers();
+
+      members.forEach((member, idx) => {
+        const typeElem = document.getElementById(`type_${idx}`);
+        const hourElem = document.getElementById(`hours_${idx}`);
+        const typeVal = typeElem ? typeElem.value : "PRESENT";
+        const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
+
+        let statusDesc = config.label;
+        if (config.needHours && hourElem) {
+          statusDesc = `${config.prefix} ${hourElem.value} ชั่วโมง`;
+        }
+
+        if (config.isLeave) {
+          leaveList.push(`${member} (${statusDesc})`);
+        } else {
+          presentList.push(member);
+        }
+      });
+
+      let lineText = `Attendance ES Quality GW#2\n`;
+      lineText += `Date : ${selectedFormatted}\n`;
+      lineText += `Attendance : ${statRatio} (${statPercent})\n\n`;
+
+      lineText += `มาทำงาน :\n`;
+      if (presentList.length > 0) {
+        presentList.forEach((name, i) => {
+          lineText += `${i + 1}.${name}\n`;
+        });
+      } else {
+        lineText += `- ไม่มี -\n`;
+      }
+
+      lineText += `\nไม่มาทำงาน :\n`;
+      if (leaveList.length > 0) {
+        leaveList.forEach((item, i) => {
+          lineText += `${i + 1}.${item}\n`;
+        });
+      } else {
+        lineText += `- ไม่มี -`;
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(lineText).catch(() => {});
+      }
+
+      const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineText)}`;
+      window.location.href = lineUrl;
+    }
+
+    function exportToJPEG() {
+      const reportElement = document.getElementById("reportCard");
+      const fileName = `Attendance_GW2_${formatDisplayDate(activeDate)}.jpg`;
+
+      html2canvas(reportElement, {
+        scale: 2.5,
+        backgroundColor: "#ffffff",
+        useCORS: true
+      }).then(canvas => {
+        const imgURI = canvas.toDataURL("image/jpeg", 0.95);
+        const link = document.createElement("a");
+        link.download = fileName;
+        link.href = imgURI;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }).catch(err => {
+        console.error(err);
+        alert("เกิดข้อผิดพลาดในการ Export JPEG");
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initSeedData();
+      selectDate(DEFAULT_DATE);
+
+      // รองรับการกดปุ่ม Enter ในช่องค้นหาเพื่อเพิ่มชื่อได้ทันที
+      const input = document.getElementById("newMemberName");
+      if (input) {
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addNewMember();
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
