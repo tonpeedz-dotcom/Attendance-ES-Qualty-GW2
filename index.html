@@ -11,24 +11,24 @@
   <!-- Google Fonts: Sarabun & Orbitron -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Sarabun:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     body {
       font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
-      font-size: 19px;
+      font-size: 16px;
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Title ไฟนีออนกระพริบ */
+    /* Title ไฟนีออนกระพริบตามแบบฉบับดั้งเดิม 100% */
     .cool-title {
       font-family: 'Orbitron', 'Sarabun', sans-serif;
-      letter-spacing: 0.5px;
-      background: linear-gradient(90deg, #06b6d4, #3b82f6, #ec4899, #8b5cf6);
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6, #06b6d4, #ec4899);
       background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: neon-gradient 5s ease infinite, blink-glow 2s ease-in-out infinite alternate;
+      animation: neon-gradient 6s ease infinite, blink-glow 2.5s ease-in-out infinite alternate;
     }
 
     @keyframes neon-gradient {
@@ -39,51 +39,41 @@
 
     @keyframes blink-glow {
       0%, 100% {
-        filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 14px rgba(14, 165, 233, 0.4));
+        filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.7)) drop-shadow(0 0 16px rgba(59, 130, 246, 0.4));
         opacity: 1;
       }
       50% {
-        filter: drop-shadow(0 0 2px rgba(236, 72, 153, 0.4));
-        opacity: 0.85;
+        filter: drop-shadow(0 0 3px rgba(236, 72, 153, 0.4));
+        opacity: 0.88;
       }
-      72% {
-        opacity: 0.95;
-      }
-      75% {
-        opacity: 0.35;
-      }
-      80% {
-        opacity: 1;
-      }
+      72% { opacity: 0.95; }
+      75% { opacity: 0.4; }
+      80% { opacity: 1; }
     }
 
-    /* ไฮไลต์เสาร์-อาทิตย์สีเหลือง */
+    /* ปฏิทิน: ไฮไลต์เสาร์-อาทิตย์ */
     .weekend-col {
       background-color: #fef3c7 !important;
       color: #92400e !important;
     }
 
-    /* วันปัจจุบัน (Today) กรอบแดง */
+    /* ปฏิทิน: วันปัจจุบัน (Today) */
     .today-marker {
-      border: 2.5px solid #ef4444 !important;
+      border: 2px solid #ef4444 !important;
       position: relative;
     }
     .today-marker::after {
       content: "วันนี้";
       position: absolute;
-      top: -9px;
-      right: -3px;
+      top: -8px;
+      right: -2px;
       background-color: #ef4444;
       color: white;
-      font-size: 9px;
-      font-weight: 700;
+      font-size: 8px;
+      font-weight: 800;
       padding: 0 4px;
       border-radius: 999px;
-      line-height: 14px;
-    }
-
-    select, input, button {
-      font-size: 16px !important;
+      line-height: 12px;
     }
 
     optgroup {
@@ -95,163 +85,206 @@
     option {
       font-weight: 600;
       padding: 6px;
+      color: #0f172a;
+      background-color: #ffffff;
+    }
+
+    /* ซ่อน Scrollbar แนวนอน / ตกแต่งแนวตั้ง */
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
 
   <!-- ================= TOP NAVBAR ================= -->
   <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 border-b border-slate-800">
-    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex justify-between items-center gap-2">
-      <div class="flex items-center gap-2">
-        <button onclick="toggleSidebar(true)" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-3 py-2 rounded-xl text-sm sm:text-base font-bold shadow transition">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar(true)" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-3.5 py-2 rounded-xl text-sm font-bold shadow transition">
           <span>📅</span>
-          <span class="hidden sm:inline">ปฏิทิน</span>
+          <span>เมนู & ปฏิทิน</span>
         </button>
-
-        <button onclick="toggleMemberModal(true)" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-cyan-300 border border-slate-700 px-3 py-2 rounded-xl text-sm sm:text-base font-bold shadow transition">
-          <span>⚙️</span>
-          <span>จัดการสมาชิก</span>
-        </button>
+        <span class="hidden sm:inline-block text-xs text-cyan-400 font-semibold tracking-wider">
+          GW#2 ATTENDANCE
+        </span>
       </div>
 
-      <div class="text-right">
-        <span class="text-[11px] text-slate-400 block font-medium">วันที่เลือก</span>
-        <span id="activeDateNavbar" class="text-base sm:text-lg font-bold text-cyan-300">15-Oct-2026</span>
+      <!-- ป้ายวันที่ Navbar -->
+      <div class="text-right flex items-center gap-2">
+        <span class="text-xs text-slate-400 hidden sm:inline">วันที่เลือก:</span>
+        <span id="activeDateNavbar" class="text-sm sm:text-base font-extrabold text-cyan-300 bg-slate-800 px-3 py-1 rounded-xl border border-slate-700 shadow-inner">
+          15-Oct-2026
+        </span>
       </div>
     </div>
   </header>
 
-  <!-- Title Banner -->
-  <div class="max-w-6xl mx-auto px-4 pt-4 sm:pt-6">
+  <!-- ================= 1. HEADER BANNER (แบบเดิม 100% ตามภาพ) ================= -->
+  <div class="max-w-7xl mx-auto px-4 pt-4 sm:pt-6 w-full">
     <div class="bg-slate-900 rounded-3xl p-5 sm:p-7 shadow-xl border border-slate-800 text-center relative overflow-hidden">
-      <span class="inline-block px-3 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/30 rounded-full text-xs sm:text-sm font-semibold tracking-wider mb-2">
-        ⚡ATTENDANCE SYSTEM BY TONPEEDZ⚡
+      <span class="inline-block px-3.5 py-1 bg-cyan-950/80 text-cyan-400 border border-cyan-500/40 rounded-full text-xs sm:text-sm font-bold tracking-wider mb-2 shadow-sm">
+        ⚡ ATTENDANCE SYSTEM BY TONPEEDZ ⚡
       </span>
-      <h1 class="cool-title text-xl sm:text-3xl lg:text-4xl font-extrabold uppercase py-1">
-        Program Attendance GW#2
+      <h1 class="cool-title text-2xl sm:text-3xl lg:text-4xl font-black uppercase py-1">
+        PROGRAM ATTENDANCE GW#2
       </h1>
-      <p class="text-slate-400 text-sm sm:text-base mt-1">
+      <p class="text-slate-400 text-xs sm:text-sm md:text-base mt-1">
         ระบบเช็คชื่อ บันทึกประวัติ และวางแผนลาล่วงหน้ารายบุคคล
       </p>
     </div>
   </div>
 
-  <!-- ================= SLIDE BAR ปฏิทิน ================= -->
+  <!-- ================= SLIDE BAR: ปฏิทิน + จัดการสมาชิก + สรุปแผนลา 5 วันทำการ ================= -->
   <div id="drawerOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
 
-  <aside id="calendarDrawer" class="fixed top-0 left-0 bottom-0 w-full max-w-sm sm:max-w-md bg-white z-50 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out">
+  <aside id="calendarDrawer" class="fixed top-0 left-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out">
+    
     <div class="p-4 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
       <div class="flex items-center gap-2">
-        <span class="text-xl">📅</span>
-        <h2 class="text-lg font-bold">ปฏิทิน & ประวัติย้อนหลัง</h2>
+        <span class="text-xl">🗂️</span>
+        <h2 class="text-base sm:text-lg font-bold">เมนู & ปฏิทินประวัติ</h2>
       </div>
-      <button onclick="toggleSidebar(false)" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-lg active:scale-90 transition">
+      <button onclick="toggleSidebar(false)" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-base active:scale-90 transition">
         ✕
       </button>
     </div>
 
-    <div class="p-4 overflow-y-auto flex-1 space-y-4">
-      <div class="flex justify-between items-center bg-slate-50 p-2 rounded-2xl border border-slate-200">
-        <button onclick="changeMonth(-1)" class="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-700 font-extrabold flex items-center justify-center active:scale-90 transition">◀</button>
-        <span id="calendarMonthYear" class="text-lg font-bold text-indigo-800">October 2026</span>
-        <button onclick="changeMonth(1)" class="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-700 font-extrabold flex items-center justify-center active:scale-90 transition">▶</button>
+    <div class="p-4 overflow-y-auto flex-1 space-y-5 custom-scroll">
+      
+      <!-- ปุ่มเปิด Modal จัดการสมาชิก -->
+      <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-3.5 flex justify-between items-center">
+        <div>
+          <h4 class="text-sm font-bold text-indigo-950 flex items-center gap-1.5">
+            <span>👥</span> รายชื่อสมาชิกในทีม
+          </h4>
+          <span class="text-xs text-indigo-600 font-medium">ปัจจุบันมี <b id="drawerMemberCount">7</b> คน</span>
+        </div>
+        <button onclick="toggleMemberModal(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow active:scale-95 transition flex items-center gap-1">
+          <span>⚙️</span> จัดการรายชื่อ
+        </button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-200">
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-md bg-amber-200 border border-amber-300 inline-block"></span>
-          <span>เสาร์ - อาทิตย์</span>
+      <!-- ส่วนปฏิทิน -->
+      <div class="space-y-3">
+        <div class="flex justify-between items-center bg-slate-50 p-2 rounded-2xl border border-slate-200">
+          <button onclick="changeMonth(-1)" class="w-9 h-9 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-700 font-extrabold flex items-center justify-center active:scale-90 transition">◀</button>
+          <span id="calendarMonthYear" class="text-base font-bold text-indigo-900">October 2026</span>
+          <button onclick="changeMonth(1)" class="w-9 h-9 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-700 font-extrabold flex items-center justify-center active:scale-90 transition">▶</button>
         </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-md border-2 border-red-500 inline-block"></span>
-          <span>Today (วันนี้)</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
-          <span>มาทำงานครบ</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
-          <span>มีคนลา / ขาด</span>
-        </div>
-      </div>
 
-      <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs uppercase pt-2">
-        <span class="weekend-col py-1.5 rounded-lg border border-amber-200">อา</span>
-        <span class="text-slate-500 py-1.5">จ</span>
-        <span class="text-slate-500 py-1.5">อ</span>
-        <span class="text-slate-500 py-1.5">พ</span>
-        <span class="text-slate-500 py-1.5">พฤ</span>
-        <span class="text-slate-500 py-1.5">ศ</span>
-        <span class="weekend-col py-1.5 rounded-lg border border-amber-200">ส</span>
-      </div>
+        <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded bg-amber-200 border border-amber-300"></span>
+            <span>เสาร์ - อาทิตย์</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded border border-red-500"></span>
+            <span>Today (วันนี้)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>มาทำงานครบ</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            <span>มีคนลา / ขาด</span>
+          </div>
+        </div>
 
-      <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 text-center text-sm"></div>
+        <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs uppercase pt-1">
+          <span class="weekend-col py-1 rounded-lg border border-amber-200">อา</span>
+          <span class="text-slate-500 py-1">จ</span>
+          <span class="text-slate-500 py-1">อ</span>
+          <span class="text-slate-500 py-1">พ</span>
+          <span class="text-slate-500 py-1">พฤ</span>
+          <span class="text-slate-500 py-1">ศ</span>
+          <span class="weekend-col py-1 rounded-lg border border-amber-200">ส</span>
+        </div>
 
-      <div class="pt-2 text-center">
-        <button onclick="goToToday()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-3 rounded-xl text-sm transition">
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+
+        <button onclick="goToToday()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-3 rounded-xl text-xs transition shadow-sm">
           🎯 กระโดดกลับไป "วันปัจจุบัน (Today)"
         </button>
       </div>
-    </div>
 
-    <div class="p-3 bg-slate-50 border-t border-slate-200 text-center">
-      <span class="text-xs text-slate-400">เลือกวันที่เพื่อดูข้อมูลหรือวางแผนลาล่วงหน้า</span>
+      <!-- สรุปแผนลาพักร้อน / ลากิจ / On Duty ใน 5 วันทำการข้างหน้า -->
+      <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md border border-slate-800 space-y-3">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+          <div>
+            <h3 class="text-sm font-extrabold text-white flex items-center gap-1.5">
+              <span>🏖️</span> แผนลา 5 วันทำการข้างหน้า
+            </h3>
+            <span class="text-[10px] text-slate-400 block" id="upcomingRangeDesc">ไม่นับเสาร์ - อาทิตย์</span>
+          </div>
+          <span id="upcomingLeaveCountBadge" class="text-xs font-black bg-cyan-950 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-lg">
+            0 คน
+          </span>
+        </div>
+        
+        <div id="upcomingLeaveContainer" class="space-y-2"></div>
+      </div>
+
     </div>
   </aside>
 
-  <!-- ================= MODAL จัดการสมาชิก + AUTO MATCHING ================= -->
+  <!-- ================= MODAL จัดการสมาชิก ================= -->
   <div id="memberModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col relative">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 shadow-2xl border border-slate-200 max-h-[85vh] flex flex-col relative">
       
       <div class="flex justify-between items-center pb-3 border-b border-slate-100">
         <div>
-          <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+          <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
             <span>👥</span> จัดการรายชื่อสมาชิก
           </h3>
-          <span class="text-xs text-slate-400 font-medium">ฐานข้อมูลพนักงาน Gateway: 502 ท่าน</span>
+          <span class="text-xs text-slate-400">ฐานข้อมูล Gateway: 502 ท่าน</span>
         </div>
         <button onclick="toggleMemberModal(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center transition">
           ✕
         </button>
       </div>
 
-      <!-- ช่องค้นหา + Auto Matching -->
-      <div class="mt-4 relative">
+      <div class="mt-3 relative">
         <div class="flex gap-2">
-          <div class="relative flex-1">
-            <input 
-              type="text" 
-              id="newMemberName" 
-              placeholder="พิมพ์ชื่อ หรือ นามสกุลเพื่อค้นหา..." 
-              autocomplete="off"
-              oninput="handleAutoMatch(this.value)"
-              onfocus="handleAutoMatch(this.value)"
-              class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-base font-semibold outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            >
-          </div>
-          <button onclick="addNewMember()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-5 py-2.5 rounded-xl font-bold transition whitespace-nowrap shadow-sm">
+          <input 
+            type="text" 
+            id="newMemberName" 
+            placeholder="พิมพ์ชื่อ หรือ นามสกุลเพื่อค้นหา..." 
+            autocomplete="off"
+            oninput="handleAutoMatch(this.value)"
+            onfocus="handleAutoMatch(this.value)"
+            class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-semibold outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          >
+          <button onclick="addNewMember()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-4 py-2 rounded-xl text-sm font-bold transition whitespace-nowrap shadow-sm">
             + เพิ่ม
           </button>
         </div>
 
-        <!-- กล่อง Dropdown ผลการค้นหา -->
-        <div id="autoMatchBox" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-2xl z-30 max-h-64 overflow-y-auto divide-y divide-slate-100"></div>
+        <div id="autoMatchBox" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-2xl z-30 max-h-60 overflow-y-auto divide-y divide-slate-100 custom-scroll"></div>
       </div>
 
-      <!-- รายชื่อปัจจุบันในทีม -->
-      <div class="mt-4 flex items-center justify-between">
-        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">สมาชิกในทีมปัจจุบัน (<span id="memberCountBadge">7</span> คน):</span>
+      <div class="mt-3 flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">สมาชิกปัจจุบัน (<span id="memberCountBadge">7</span> คน):</span>
       </div>
-      <div class="mt-2 flex-1 overflow-y-auto space-y-2 pr-1" id="manageMemberList"></div>
+      <div class="mt-2 flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scroll" id="manageMemberList"></div>
 
-      <!-- ท้าย Modal -->
-      <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
+      <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center">
         <button onclick="resetDefaultMembers()" class="text-xs text-rose-600 hover:underline font-semibold">
           รีเซ็ตเป็น 7 ท่านเริ่มต้น
         </button>
-        <button onclick="toggleMemberModal(false)" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold transition">
+        <button onclick="toggleMemberModal(false)" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition">
           ปิดหน้าต่าง
         </button>
       </div>
@@ -259,132 +292,134 @@
   </div>
 
   <!-- ================= MAIN CONTENT ================= -->
-  <main class="max-w-6xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <main class="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-5 w-full flex-1">
 
-    <!-- ฟอร์มบันทึกสถานะ -->
-    <div class="lg:col-span-6 bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
-      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-        <div>
-          <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-1.5">
-            <span>✍️</span> บันทึกสถานะ / วางแผนลา
-          </h2>
-          <div class="flex items-center gap-2 mt-1">
-            <span class="text-sm font-bold text-indigo-600" id="formCurrentDate">15-Oct-2026</span>
-            <span id="dateSaveStatusBadge" class="text-[11px] px-2 py-0.5 rounded-full font-bold"></span>
-            <span id="advancePlanTag" class="hidden text-[11px] bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded-full font-bold">วางแผนล่วงหน้า</span>
+    <!-- ฝั่งซ้าย: ฟอร์มบันทึกสถานะ (รองรับ 40 คนด้วย 2-Column Grid + Sticky Action Bar) -->
+    <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col relative">
+      
+      <!-- 3. DATE HERO CARD: วันที่ขนาดใหญ่ คมชัด ไม่ต้องเพ่งสายตา (Sticky Top) -->
+      <div class="sticky top-[60px] bg-white z-20 pb-3 border-b border-slate-100 mb-3 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.05)]">
+        
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-3.5 sm:p-4 rounded-2xl shadow-md border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl">📅</span>
+              <span id="heroDayOfWeek" class="text-sm sm:text-base font-bold text-indigo-200">วันพฤหัสบดี</span>
+              <span id="dateSaveStatusBadge" class="text-[11px] px-2.5 py-0.5 rounded-full font-bold"></span>
+              <span id="advancePlanTag" class="hidden text-[11px] bg-cyan-900/90 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-full font-bold">🏖️ วางแผนล่วงหน้า</span>
+            </div>
+            
+            <!-- ตัวเลขอักษรวันที่ขนาดใหญ่พิเศษ (Hero Size) -->
+            <div class="mt-0.5 flex items-baseline gap-2">
+              <h2 id="heroDisplayDate" class="text-2xl sm:text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                15-Oct-2026
+              </h2>
+              <span id="heroDateContext" class="text-xs font-bold text-amber-300"></span>
+            </div>
           </div>
+
+          <button onclick="setAllPresent()" class="self-stretch sm:self-auto bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+            <span>✓</span> มาทุกคน
+          </button>
         </div>
 
-        <button onclick="setAllPresent()" class="text-sm bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-xl border border-emerald-200 active:scale-95 transition">
-          ✓ มาทุกคน
-        </button>
+        <div class="flex justify-between items-center mt-2 px-1 text-xs text-slate-500">
+          <span class="font-bold">รายชื่อสมาชิกทีม (<span id="totalFormMembers">7</span> คน)</span>
+          <span class="text-[11px] text-slate-400">💡 เปลี่ยนสถานะสีจะเปลี่ยนทันที</span>
+        </div>
       </div>
 
-      <div id="memberInputList" class="space-y-3"></div>
+      <!-- 2. พื้นที่แสดงผลรายชื่อ 40 คน: 
+           - มือถือ: 1 คอลัมน์เดี่ยว 
+           - แท็บเล็ต / จอใหญ่: 2 คอลัมน์คู่ (md:grid-cols-2) เพื่อประหยัดพื้นที่แนวตั้ง -->
+      <div id="memberInputList" class="grid grid-cols-1 md:grid-cols-2 gap-2 overflow-y-auto max-h-[55vh] sm:max-h-[58vh] pr-1.5 custom-scroll flex-1 py-1"></div>
 
-      <!-- ปุ่มบันทึกข้อมูล + ปุ่มล้างข้อมูลประจำวัน -->
-      <div class="pt-2 flex gap-3">
-        <button onclick="saveCurrentData()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-lg font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
+      <!-- 2. STICKY ACTION BAR ด้านล่าง: ลอยตรึงกับที่ ไม่ต้องเลื่อนจอลงมากดบันทึก -->
+      <div class="sticky bottom-0 bg-white/95 backdrop-blur-md pt-3 mt-2 border-t border-slate-100 flex gap-2 z-20">
+        <button onclick="saveCurrentData()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-base sm:text-lg font-bold py-3 px-4 rounded-2xl shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
           <span>💾</span> บันทึกข้อมูลวันนี้ / แผนลา
         </button>
-        <button onclick="clearCurrentDateData()" id="clearDateBtn" class="bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 border border-rose-200 font-bold px-4 py-3.5 rounded-2xl text-base transition flex items-center justify-center gap-1.5" title="ล้างข้อมูลวันที่เลือก">
-          <span>🗑️</span> <span class="hidden sm:inline">ล้างข้อมูล</span>
+        <button onclick="clearCurrentDateData()" id="clearDateBtn" class="bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 border border-rose-200 font-bold px-4 py-3 rounded-2xl text-sm transition flex items-center justify-center gap-1" title="ล้างข้อมูลวันที่เลือก">
+          <span>🗑️</span>
+          <span class="hidden sm:inline">ล้างข้อมูล</span>
         </button>
       </div>
+
     </div>
 
-    <!-- ส่วน Preview Card + ปุ่มแชร์ LINE + Export JPEG -->
-    <div class="lg:col-span-6 flex flex-col gap-4">
-      <div id="reportCard" class="bg-white p-5 sm:p-6 rounded-3xl shadow-md border border-slate-200 text-slate-800">
-        <div class="border-b-2 border-slate-100 pb-3 mb-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-[11px] uppercase tracking-wider font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">
-                ES Quality GW#2
-              </span>
-              <h3 class="text-2xl font-black text-slate-900 mt-1">
-                สรุป Attendance ทีม
-              </h3>
+    <!-- ฝั่งขวา: Card Preview & Share LINE -->
+    <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+      
+      <div id="reportCard" class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 text-slate-800 flex-1 flex flex-col justify-between">
+        <div>
+          <div class="border-b border-slate-100 pb-3 mb-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] uppercase tracking-wider font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                  ES Quality GW#2
+                </span>
+                <h3 class="text-lg sm:text-xl font-black text-slate-900 mt-1">
+                  สรุป Attendance ทีม
+                </h3>
+              </div>
+              <div class="text-right">
+                <span id="cardDate" class="text-sm sm:text-base font-extrabold text-slate-800 block">15-Oct-2026</span>
+                <span class="text-[10px] text-slate-400 font-medium">ประจำวัน</span>
+              </div>
             </div>
-            <div class="text-right">
-              <span id="cardDate" class="text-base sm:text-lg font-bold text-slate-700 block">15-Oct-2026</span>
-              <span class="text-xs text-slate-400">ประจำวัน</span>
+
+            <!-- กล่องสรุปตัวเลขสถิติ -->
+            <div class="mt-2.5 bg-slate-50 rounded-2xl p-2.5 flex justify-around items-center border border-slate-200">
+              <div class="text-center">
+                <span class="text-[11px] text-slate-500 block font-medium">มาทำงาน</span>
+                <span id="statRatio" class="text-lg sm:text-xl font-black text-slate-800">6/7 คน</span>
+              </div>
+              <div class="w-px h-7 bg-slate-300"></div>
+              <div class="text-center">
+                <span class="text-[11px] text-slate-500 block font-medium">เปอร์เซ็นต์เข้างาน</span>
+                <span id="statPercent" class="text-lg sm:text-xl font-black text-emerald-600">85.7%</span>
+              </div>
             </div>
           </div>
 
-          <div class="mt-3 bg-slate-50 rounded-2xl p-3 flex justify-around items-center border border-slate-200">
-            <div class="text-center">
-              <span class="text-xs text-slate-500 block font-medium">มาทำงาน</span>
-              <span id="statRatio" class="text-xl sm:text-2xl font-extrabold text-slate-800">6/7 คน</span>
-            </div>
-            <div class="w-px h-8 bg-slate-300"></div>
-            <div class="text-center">
-              <span class="text-xs text-slate-500 block font-medium">เปอร์เซ็นต์เข้างาน</span>
-              <span id="statPercent" class="text-xl sm:text-2xl font-extrabold text-emerald-600">85.7%</span>
-            </div>
+          <!-- Preview Items -->
+          <div class="space-y-1.5">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+              สถานะรายบุคคล:
+            </span>
+            <ul id="previewList" class="space-y-1.5 max-h-[380px] overflow-y-auto pr-1 custom-scroll"></ul>
           </div>
         </div>
 
-        <div class="space-y-1.5">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-            รายชื่อสมาชิกในทีม:
-          </span>
-          <ul id="previewList" class="space-y-2"></ul>
-        </div>
-
-        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400">
+        <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400">
           <span>ES Quality GW#2</span>
           <span>สร้างรายงานจาก Attendance System</span>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="space-y-2.5">
-        <button onclick="shareTextToLine()" class="w-full bg-[#06C755] hover:bg-[#05b34c] active:scale-98 text-white text-lg font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2.5">
-          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+      <div class="grid grid-cols-2 gap-2.5">
+        <button onclick="shareTextToLine()" class="bg-[#06C755] hover:bg-[#05b34c] active:scale-98 text-white text-sm sm:text-base font-bold py-3 px-3 rounded-2xl shadow-md transition flex items-center justify-center gap-1.5">
+          <svg class="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 5.82 2 10.53c0 2.93 1.76 5.51 4.42 7.02-.19.68-.7 2.47-.8 2.84-.13.46.17.45.36.33.15-.09 2.06-1.39 2.91-1.97.36.05.73.08 1.11.08 5.52 0 10-3.82 10-8.53S17.52 2 12 2zm-4.7 11.23h-1.6c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5h1.6c.28 0 .5.22.5.5s-.22.5-.5.5H6.2v1.25h1.1c.28 0 .5.22.5.5s-.22.5-.5.5H6.2V12h1.1c.28 0 .5.22.5.5s-.22.5-.5.5zm2.85 0c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5s.5.22.5.5v4.5c0 .28-.22.5-.5.5zm4.8 0c-.16 0-.31-.08-.39-.21l-2.06-2.92v2.63c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4.5c0-.18.09-.34.25-.43.15-.08.34-.07.48.03l2.06 2.92v-2.55c0-.28.22-.5.5-.5s.5.22.5.5v4.5c0 .28-.22.5-.5.5zm3.15-3.5h-1.5v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5h2c.28 0 .5.22.5.5s-.22.5-.5.5h-1.5V9.5h1.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
           </svg>
-          ส่ง Report เข้า LINE
+          ส่งเข้า LINE
         </button>
 
-        <button onclick="exportToJPEG()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-98 text-white text-base font-bold py-3 px-4 rounded-2xl shadow transition flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button onclick="exportToJPEG()" class="bg-slate-800 hover:bg-slate-900 active:scale-98 text-white text-sm sm:text-base font-bold py-3 px-3 rounded-2xl shadow transition flex items-center justify-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          Export เป็นรูปภาพ JPEG
+          Export รูปภาพ
         </button>
       </div>
+
     </div>
   </main>
 
-  <!-- ================= SECTION: แผนลาพักร้อน / ลากิจ / On Duty ใน 5 วันทำการข้างหน้า ================= -->
-  <section class="max-w-6xl mx-auto px-4 mt-8">
-    <div class="bg-slate-900 text-white p-6 sm:p-7 rounded-3xl shadow-xl border border-slate-800">
-      
-      <!-- หัวข้อการ์ด -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-800/80 gap-2">
-        <div>
-          <h3 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
-            <span>🏖️</span> แผนลาพักร้อน / ลากิจ / On Duty ใน 5 วันทำการข้างหน้า
-          </h3>
-          <p class="text-slate-400 text-xs sm:text-sm mt-0.5" id="upcomingRangeDesc">
-            เรียงตามวันที่ใกล้ที่สุด (ไม่นับวันเสาร์ - อาทิตย์)
-          </p>
-        </div>
-        <div class="flex items-center gap-2 text-xs text-cyan-400 bg-cyan-950/80 border border-cyan-500/30 px-3 py-1.5 rounded-xl self-start sm:self-auto font-medium">
-          <span>📅 สรุปยอดแผนลาล่วงหน้า:</span>
-          <span id="upcomingLeaveCountBadge" class="font-extrabold text-white text-sm">0 คน</span>
-        </div>
-      </div>
-
-      <!-- รายการแสดงผลคนลาล่วงหน้า -->
-      <div id="upcomingLeaveContainer" class="space-y-3"></div>
-    </div>
-  </section>
-
   <!-- ================= JAVASCRIPT ================= -->
   <script>
-    // ฐานข้อมูลพนักงาน Gateway ครบทั้ง 502 ท่าน (ตัดคำนำหน้าออก 100%)
+    // ฐานข้อมูลพนักงาน Gateway 502 ท่าน
     const MASTER_GATEWAY_NAMES = [
       "ธีรยุทธ ชัยรถ", "ชัยวิชิตย์ ดอนหอมดี", "ภากร พิชญพรชัย", "ณัฐพล อสุณีย์", "กฤษสร ชาติศิริ", "สัญญา สุขสวัสดิ์",
       "สุรชัย วิเชียรทอง", "วิรัตน์ รัตนราช", "ไพโรจน์ พึ่งเกษม", "บุญมี ตรีวิเศษ", "ไกรฤกษ์ แต่งทรัพย์", "จรัญ ผุดผ่องใส",
@@ -482,7 +517,7 @@
       "วีระพงษ์ ทามแก้ว"
     ];
 
-    // โครงสร้างตัวเลือกสถานะ จัดกลุ่มชัดเจน
+    // โครงสร้างประเภทการลาแบบ optgroup ครบถ้วน
     const STATUS_GROUPS = [
       {
         groupName: "ปฏิบัติงาน",
@@ -538,64 +573,52 @@
     ];
 
     const BASE_STATUS_OPTIONS = STATUS_GROUPS.flatMap(g => g.options);
-    const ALLOWED_HOURS = [1, 2, 3, 5, 6, 7]; // ตัด 4 ชม. (ครึ่งวัน) และ 8 ชม. (เต็มวัน) ออก
+    const ALLOWED_HOURS = [1, 2, 3, 5, 6, 7]; // ตัด 4 ชม. (ครึ่งวัน) และ 8 ชม. (เต็มวัน)
 
-    function getCategoryMeta(category) {
+    function getCategoryStyle(category) {
       switch(category) {
         case "PRESENT":
           return {
-            badgeText: "มาทำงาน",
-            badgeClass: "bg-emerald-100 text-emerald-700 border border-emerald-300",
-            formCardClass: "bg-slate-50 border-slate-200",
-            previewCardClass: "bg-white border-slate-200 text-slate-800",
-            previewDotClass: "bg-emerald-500",
-            previewBadgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200"
+            rowBorder: "border-slate-200 bg-white hover:border-slate-300",
+            selectClass: "bg-emerald-50 text-emerald-800 border-emerald-300 focus:ring-emerald-400",
+            previewBadge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+            dot: "bg-emerald-500"
           };
         case "VACATION":
           return {
-            badgeText: "🏖️ พักร้อน",
-            badgeClass: "bg-teal-100 text-teal-800 border border-teal-300",
-            formCardClass: "bg-teal-50/60 border-teal-300",
-            previewCardClass: "bg-teal-50/90 border-teal-300 text-teal-950 shadow-sm ring-1 ring-teal-200",
-            previewDotClass: "bg-teal-600 animate-pulse",
-            previewBadgeClass: "bg-teal-600 text-white border-teal-600 shadow"
+            rowBorder: "border-teal-300 bg-teal-50/50 shadow-sm",
+            selectClass: "bg-teal-600 text-white border-teal-600 font-bold shadow-sm",
+            previewBadge: "bg-teal-600 text-white border-teal-600 shadow",
+            dot: "bg-teal-600 animate-pulse"
           };
         case "BUSINESS":
           return {
-            badgeText: "💼 ลากิจ",
-            badgeClass: "bg-amber-100 text-amber-800 border border-amber-300",
-            formCardClass: "bg-amber-50/60 border-amber-300",
-            previewCardClass: "bg-amber-50/90 border-amber-300 text-amber-950 shadow-sm ring-1 ring-amber-200",
-            previewDotClass: "bg-amber-600 animate-pulse",
-            previewBadgeClass: "bg-amber-600 text-white border-amber-600 shadow"
+            rowBorder: "border-amber-300 bg-amber-50/50 shadow-sm",
+            selectClass: "bg-amber-600 text-white border-amber-600 font-bold shadow-sm",
+            previewBadge: "bg-amber-600 text-white border-amber-600 shadow",
+            dot: "bg-amber-600 animate-pulse"
           };
         case "SICK":
           return {
-            badgeText: "🤒 ลาป่วย",
-            badgeClass: "bg-rose-100 text-rose-800 border border-rose-300",
-            formCardClass: "bg-rose-50/60 border-rose-300",
-            previewCardClass: "bg-rose-50/90 border-rose-300 text-rose-950 shadow-sm ring-1 ring-rose-200",
-            previewDotClass: "bg-rose-600 animate-pulse",
-            previewBadgeClass: "bg-rose-600 text-white border-rose-600 shadow"
+            rowBorder: "border-rose-300 bg-rose-50/50 shadow-sm",
+            selectClass: "bg-rose-600 text-white border-rose-600 font-bold shadow-sm",
+            previewBadge: "bg-rose-600 text-white border-rose-600 shadow",
+            dot: "bg-rose-600 animate-pulse"
           };
         case "ONDUTY":
           return {
-            badgeText: "🚗 On Duty",
-            badgeClass: "bg-indigo-100 text-indigo-800 border border-indigo-300",
-            formCardClass: "bg-indigo-50/60 border-indigo-300",
-            previewCardClass: "bg-indigo-50/90 border-indigo-300 text-indigo-950 shadow-sm ring-1 ring-indigo-200",
-            previewDotClass: "bg-indigo-600 animate-pulse",
-            previewBadgeClass: "bg-indigo-600 text-white border-indigo-600 shadow"
+            rowBorder: "border-indigo-300 bg-indigo-50/50 shadow-sm",
+            selectClass: "bg-indigo-600 text-white border-indigo-600 font-bold shadow-sm",
+            previewBadge: "bg-indigo-600 text-white border-indigo-600 shadow",
+            dot: "bg-indigo-600 animate-pulse"
           };
         case "ABSENT":
         default:
           return {
-            badgeText: "⚠️ ขาดงาน",
-            badgeClass: "bg-red-100 text-red-800 border border-red-300",
-            formCardClass: "bg-red-50/60 border-red-300",
-            previewCardClass: "bg-red-50/90 border-red-300 text-red-950 shadow-sm ring-1 ring-red-200",
-            previewDotClass: "bg-red-600 animate-pulse",
-            previewBadgeClass: "bg-red-600 text-white border-red-600 shadow"
+            rowBorder: "border-red-300 bg-red-50/50 shadow-sm",
+            selectClass: "bg-red-600 text-white border-red-600 font-bold shadow-sm",
+            previewBadge: "bg-red-600 text-white border-red-600 shadow",
+            dot: "bg-red-600 animate-pulse"
           };
       }
     }
@@ -632,10 +655,22 @@
       return `${parseInt(d, 10)}-${months[parseInt(m, 10) - 1]}-${y}`;
     }
 
+    function getThaiDateMeta(dateStr) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const targetDate = new Date(y, m - 1, d);
+      const days = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
+      const monthsThai = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      
+      return {
+        dayOfWeek: days[targetDate.getDay()],
+        thaiFull: `${d} ${monthsThai[m - 1]} ${y + 543}`,
+        isWeekend: (targetDate.getDay() === 0 || targetDate.getDay() === 6)
+      };
+    }
+
     function initSeedData() {
       const db = getDB();
 
-      // ล้างคีย์ที่มีตัวเลขนำหน้า เพื่อกันแสดงผลเบิ้ล
       for (let date in db) {
         const dayRec = db[date];
         if (dayRec && typeof dayRec === "object") {
@@ -702,7 +737,7 @@
 
       if (matches.length === 0) {
         box.innerHTML = `
-          <div class="p-3.5 text-xs text-slate-400 text-center">
+          <div class="p-3 text-xs text-slate-400 text-center">
             ไม่พบชื่อในฐานข้อมูลเกตเวย์ (คุณสามารถพิมพ์ชื่อเองแล้วกด <b>+ เพิ่ม</b> ได้ทันที)
           </div>
         `;
@@ -711,13 +746,13 @@
       }
 
       const header = document.createElement("div");
-      header.className = "px-3 py-1.5 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center border-b border-slate-100";
+      header.className = "px-3 py-1 bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center border-b border-slate-100";
       header.innerHTML = `<span>พบ ${matches.length} รายชื่อ</span><span>แตะเพื่อเลือก</span>`;
       box.appendChild(header);
 
-      matches.slice(0, 25).forEach(name => {
+      matches.slice(0, 20).forEach(name => {
         const item = document.createElement("div");
-        item.className = "px-4 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 cursor-pointer flex justify-between items-center transition border-b border-slate-100 last:border-none";
+        item.className = "px-3.5 py-2 hover:bg-indigo-50 active:bg-indigo-100 cursor-pointer flex justify-between items-center transition border-b border-slate-100 last:border-none";
         
         let highlighted = name;
         searchWords.forEach(w => {
@@ -728,8 +763,8 @@
         });
 
         item.innerHTML = `
-          <span class="text-sm font-bold text-slate-700">${highlighted}</span>
-          <span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">+ เลือก</span>
+          <span class="text-xs sm:text-sm font-bold text-slate-700">${highlighted}</span>
+          <span class="text-[11px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">+ เลือก</span>
         `;
 
         item.addEventListener("click", () => {
@@ -774,15 +809,19 @@
       const members = getMembers();
       const list = document.getElementById("manageMemberList");
       const badge = document.getElementById("memberCountBadge");
+      const drawerCount = document.getElementById("drawerMemberCount");
+      const formTotal = document.getElementById("totalFormMembers");
       if (badge) badge.innerText = members.length;
+      if (drawerCount) drawerCount.innerText = members.length;
+      if (formTotal) formTotal.innerText = members.length;
       list.innerHTML = "";
 
       members.forEach((m, idx) => {
         const div = document.createElement("div");
-        div.className = "flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200";
+        div.className = "flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200";
         div.innerHTML = `
-          <span class="font-bold text-slate-700 text-sm">${idx + 1}. ${m}</span>
-          <button onclick="removeMember(${idx})" class="text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-rose-200 transition">
+          <span class="font-bold text-slate-700 text-xs sm:text-sm">${idx + 1}. ${m}</span>
+          <button onclick="removeMember(${idx})" class="text-rose-600 hover:bg-rose-50 px-2 py-0.5 rounded text-xs font-bold border border-rose-200 transition">
             ลบ
           </button>
         `;
@@ -847,6 +886,10 @@
       const drawer = document.getElementById("calendarDrawer");
       const overlay = document.getElementById("drawerOverlay");
       if (open) {
+        const members = getMembers();
+        const drawerCount = document.getElementById("drawerMemberCount");
+        if (drawerCount) drawerCount.innerText = members.length;
+        renderUpcomingVacations();
         drawer.classList.remove("-translate-x-full");
         overlay.classList.remove("opacity-0", "pointer-events-none");
         overlay.classList.add("opacity-100", "pointer-events-auto");
@@ -864,16 +907,33 @@
       toggleSidebar(false);
     }
 
+    // ================= RENDER FORM: 2 คอลัมน์คู่ รองรับ 40 คน =================
     function renderInputForm(records) {
       const container = document.getElementById("memberInputList");
       container.innerHTML = "";
 
       const members = getMembers();
+      document.getElementById("totalFormMembers").innerText = members.length;
+
       const isAdvance = activeDate > realToday;
+      const isToday = activeDate === realToday;
+      
       const advanceTag = document.getElementById("advancePlanTag");
-      if (isAdvance) {
+      const dateMeta = getThaiDateMeta(activeDate);
+
+      // 3. ปรับปรุง Date Hero Badge ให้ตัวใหญ่ คมชัด
+      document.getElementById("heroDayOfWeek").innerText = `${dateMeta.dayOfWeek} (${dateMeta.thaiFull})`;
+      document.getElementById("heroDisplayDate").innerText = formatDisplayDate(activeDate);
+
+      const contextText = document.getElementById("heroDateContext");
+      if (isToday) {
+        contextText.innerText = "🎯 วันนี้ (Today)";
+        advanceTag.classList.add("hidden");
+      } else if (isAdvance) {
+        contextText.innerText = "🏖️ วางแผนล่วงหน้า";
         advanceTag.classList.remove("hidden");
       } else {
+        contextText.innerText = "📅 ประวัติย้อนหลัง";
         advanceTag.classList.add("hidden");
       }
 
@@ -883,13 +943,14 @@
       if (statusBadge) {
         if (isDateSaved) {
           statusBadge.innerText = "✓ บันทึกแล้ว";
-          statusBadge.className = "text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700 border border-emerald-300";
+          statusBadge.className = "text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-500 text-white shadow-sm";
         } else {
           statusBadge.innerText = "รอการบันทึก";
-          statusBadge.className = "text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-slate-100 text-slate-500 border border-slate-300";
+          statusBadge.className = "text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-slate-700 text-slate-300";
         }
       }
 
+      // Render แต่ละคนลง Grid (2 คอลัมน์บนจอแท็บเล็ต/คอม และ 1 คอลัมน์บนมือถือ)
       members.forEach((member, idx) => {
         let item = records[member] || records[`${idx + 1}.${member}`] || { type: "PRESENT", hours: 1, note: "", text: "มาทำงาน" };
         if (typeof item === "string") {
@@ -906,52 +967,58 @@
         const currentHours = ALLOWED_HOURS.includes(Number(item.hours)) ? Number(item.hours) : 1;
         const currentNote = item.note || "";
         const config = BASE_STATUS_OPTIONS.find(o => o.id === currentType) || BASE_STATUS_OPTIONS[0];
-        const meta = getCategoryMeta(config.category);
+        const style = getCategoryStyle(config.category);
 
         const div = document.createElement("div");
         div.id = `memberRow_${idx}`;
-        div.className = `p-3.5 rounded-2xl border transition flex flex-col gap-2.5 ${meta.formCardClass}`;
+        div.className = `p-2 sm:p-2.5 rounded-2xl border transition flex flex-col justify-between gap-1.5 ${style.rowBorder}`;
 
         div.innerHTML = `
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-slate-800 text-base">${idx + 1}. ${member}</span>
-            <span id="badge_${idx}" class="text-xs px-2.5 py-0.5 rounded-full font-bold ${meta.badgeClass}">
-              ${meta.badgeText}
-            </span>
-          </div>
-
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <select id="type_${idx}" onchange="onStatusChange(${idx})" class="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
-              ${STATUS_GROUPS.map(group => `
-                <optgroup label="${group.icon}${group.groupName}">
-                  ${group.options.map(opt => `
-                    <option value="${opt.id}" ${opt.id === currentType ? "selected" : ""}>
-                      ${opt.label}
-                    </option>
-                  `).join("")}
-                </optgroup>
-              `).join("")}
-            </select>
+          <div class="flex items-center justify-between gap-2">
             
-            <!-- ช่องเลือกชั่วโมง (มีแค่ 1, 2, 3, 5, 6, 7 ชม.) -->
-            <div id="hourWrapper_${idx}" class="${config.needHours ? 'flex' : 'hidden'} items-center gap-1 min-w-[110px]">
-              <select id="hours_${idx}" onchange="updateLivePreview()" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-sm sm:text-base font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
-                ${ALLOWED_HOURS.map(h => `
-                  <option value="${h}" ${h === currentHours ? "selected" : ""}>${h} ชม.</option>
+            <!-- ชื่อขนาดใหญ่ คมชัด -->
+            <div class="flex items-center gap-1.5 min-w-0 flex-1">
+              <span class="text-xs font-black text-slate-400 shrink-0">${idx + 1}.</span>
+              <span class="font-extrabold text-sm sm:text-base text-slate-800 truncate tracking-tight">
+                ${member}
+              </span>
+            </div>
+
+            <!-- กล่องสี่เหลี่ยมผืนผ้าเลือกสถานะ (Compact Pill) -->
+            <div class="flex items-center gap-1 shrink-0">
+              <select id="type_${idx}" onchange="onStatusChange(${idx})" class="text-xs sm:text-sm font-bold rounded-xl border px-2.5 py-1.5 outline-none transition cursor-pointer ${style.selectClass}">
+                ${STATUS_GROUPS.map(group => `
+                  <optgroup label="${group.icon}${group.groupName}">
+                    ${group.options.map(opt => `
+                      <option value="${opt.id}" ${opt.id === currentType ? "selected" : ""}>
+                        ${opt.label}
+                      </option>
+                    `).join("")}
+                  </optgroup>
                 `).join("")}
               </select>
+              
+              <!-- ช่องเลือกชั่วโมง (1,2,3,5,6,7) -->
+              <div id="hourWrapper_${idx}" class="${config.needHours ? 'flex' : 'hidden'} items-center">
+                <select id="hours_${idx}" onchange="updateLivePreview()" class="text-xs sm:text-sm font-bold bg-white border border-slate-300 rounded-xl px-2 py-1.5 outline-none text-slate-800 shadow-sm">
+                  ${ALLOWED_HOURS.map(h => `
+                    <option value="${h}" ${h === currentHours ? "selected" : ""}>${h} ชม.</option>
+                  `).join("")}
+                </select>
+              </div>
             </div>
+
           </div>
 
           <!-- ช่องกรอกรายละเอียด On Duty -->
-          <div id="noteWrapper_${idx}" class="${config.needNote ? 'block' : 'hidden'} pt-0.5">
+          <div id="noteWrapper_${idx}" class="${config.needNote ? 'block' : 'hidden'} pt-1">
             <input 
               type="text" 
               id="note_${idx}" 
-              placeholder="ระบุรายละเอียด On Duty เช่น ไป Samrong / อบรม / ไป บ.แม่..." 
+              placeholder="ระบุรายละเอียด On Duty เช่น ไป Samrong / อบรม..." 
               value="${currentNote}" 
               oninput="updateLivePreview()" 
-              class="w-full bg-white border border-indigo-300 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none placeholder:text-slate-400 shadow-inner"
+              class="w-full bg-white border border-indigo-300 rounded-xl px-2.5 py-1 text-xs sm:text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none shadow-inner"
             />
           </div>
         `;
@@ -964,13 +1031,12 @@
       const hourWrapper = document.getElementById(`hourWrapper_${idx}`);
       const noteWrapper = document.getElementById(`noteWrapper_${idx}`);
       const rowElem = document.getElementById(`memberRow_${idx}`);
-      const badge = document.getElementById(`badge_${idx}`);
 
       const typeVal = typeSelect.value;
       const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
-      const meta = getCategoryMeta(config.category);
+      const style = getCategoryStyle(config.category);
 
-      // เปิด/ปิดช่องระบุชั่วโมง
+      // เปิด/ปิดชม.
       if (config.needHours) {
         hourWrapper.classList.remove("hidden");
         hourWrapper.classList.add("flex");
@@ -979,7 +1045,7 @@
         hourWrapper.classList.remove("flex");
       }
 
-      // เปิด/ปิดช่องกรอกรายละเอียด On Duty
+      // เปิด/ปิด Note On Duty
       if (config.needNote) {
         noteWrapper.classList.remove("hidden");
         noteWrapper.classList.add("block");
@@ -988,10 +1054,8 @@
         noteWrapper.classList.remove("block");
       }
 
-      // อัปเดตสีการ์ดและ Badge
-      badge.className = `text-xs px-2.5 py-0.5 rounded-full font-bold ${meta.badgeClass}`;
-      badge.innerText = meta.badgeText;
-      rowElem.className = `p-3.5 rounded-2xl border transition flex flex-col gap-2.5 ${meta.formCardClass}`;
+      typeSelect.className = `text-xs sm:text-sm font-bold rounded-xl border px-2.5 py-1.5 outline-none transition cursor-pointer ${style.selectClass}`;
+      rowElem.className = `p-2 sm:p-2.5 rounded-2xl border transition flex flex-col justify-between gap-1.5 ${style.rowBorder}`;
 
       updateLivePreview();
       renderUpcomingVacations();
@@ -1014,7 +1078,7 @@
 
         const typeVal = typeElem.value;
         const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
-        const meta = getCategoryMeta(config.category);
+        const style = getCategoryStyle(config.category);
 
         let statusText = config.label;
         if (config.needHours) {
@@ -1031,16 +1095,18 @@
         }
 
         const li = document.createElement("li");
-        li.className = `p-2.5 sm:p-3 rounded-2xl border transition flex justify-between items-center ${meta.previewCardClass}`;
+        li.className = `p-2 sm:p-2.5 rounded-2xl border flex justify-between items-center transition ${
+          isLeave ? 'bg-slate-50 border-slate-300' : 'bg-white border-slate-200'
+        }`;
 
         li.innerHTML = `
           <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full ${meta.previewDotClass}"></span>
-            <span class="font-bold text-base sm:text-lg ${isLeave ? 'font-black' : 'text-slate-800'}">
+            <span class="w-2.5 h-2.5 rounded-full ${style.dot}"></span>
+            <span class="font-extrabold text-xs sm:text-sm ${isLeave ? 'font-black text-slate-900' : 'text-slate-700'}">
               ${idx + 1}. ${member}
             </span>
           </div>
-          <span class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-bold border ${meta.previewBadgeClass}">
+          <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold border ${style.previewBadge}">
             ${statusText}
           </span>
         `;
@@ -1053,7 +1119,6 @@
 
       const formatted = formatDisplayDate(activeDate);
       document.getElementById("cardDate").innerText = formatted;
-      document.getElementById("formCurrentDate").innerText = formatted;
       document.getElementById("activeDateNavbar").innerText = formatted;
     }
 
@@ -1158,7 +1223,7 @@
 
       for (let i = 0; i < firstDayIndex; i++) {
         const emptyCell = document.createElement("div");
-        emptyCell.className = "h-11";
+        emptyCell.className = "h-9";
         grid.appendChild(emptyCell);
       }
 
@@ -1196,15 +1261,15 @@
         let statusDot = "";
         if (hasRecord) {
           statusDot = hasLeave 
-            ? `<span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>`
-            : `<span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>`;
+            ? `<span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span>`
+            : `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>`;
         }
 
         let customClasses = "";
         if (isSelected) {
-          customClasses = "bg-indigo-600 text-white font-extrabold shadow-md ring-2 ring-indigo-400";
+          customClasses = "bg-indigo-600 text-white font-extrabold shadow-sm ring-2 ring-indigo-400";
         } else if (isWeekend) {
-          customClasses = "weekend-col border border-amber-200/80 font-bold hover:bg-amber-200";
+          customClasses = "weekend-col border border-amber-200 font-bold hover:bg-amber-200";
         } else {
           customClasses = "bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200/70";
         }
@@ -1213,10 +1278,10 @@
           customClasses += " today-marker";
         }
 
-        btn.className = `h-11 rounded-xl flex flex-col items-center justify-center font-bold text-sm transition ${customClasses}`;
+        btn.className = `h-9 rounded-xl flex flex-col items-center justify-center font-bold text-xs transition ${customClasses}`;
         btn.innerHTML = `
           <span>${d}</span>
-          <div class="h-2 flex items-center justify-center">${statusDot}</div>
+          <div class="h-1.5 flex items-center justify-center">${statusDot}</div>
         `;
 
         grid.appendChild(btn);
@@ -1270,7 +1335,7 @@
       if (rangeDesc && next5Days.length > 0) {
         const startDay = next5Days[0];
         const endDay = next5Days[next5Days.length - 1];
-        rangeDesc.innerText = `อิงจากวันที่เลือก: ${formatDisplayDate(baseDate)} | ช่วงตรวจสอบ 5 วันทำการ: ${startDay.dayNumber} ${startDay.monthName} - ${endDay.dayNumber} ${endDay.monthName} (ไม่นับ ส-อา)`;
+        rangeDesc.innerText = `ช่วง ${startDay.dayNumber} ${startDay.monthName} - ${endDay.dayNumber} ${endDay.monthName} (ไม่นับ ส-อา)`;
       }
 
       const leaveList = [];
@@ -1341,10 +1406,8 @@
 
       if (leaveList.length === 0) {
         container.innerHTML = `
-          <div class="p-8 text-center bg-slate-800/50 rounded-2xl border border-dashed border-slate-700">
-            <span class="text-3xl block mb-2">🌴</span>
-            <span class="text-slate-300 font-bold block text-base">ไม่มีสมาชิกวางแผนลาพักร้อน, ลากิจ หรือ On Duty ในช่วง 5 วันทำการข้างหน้า</span>
-            <span class="text-xs text-slate-500 mt-1 block">สามารถคลิกเลือกวันในปฏิทินเพื่อวางแผนและบันทึกการลาล่วงหน้าได้</span>
+          <div class="p-4 text-center bg-slate-800/60 rounded-xl border border-dashed border-slate-700">
+            <span class="text-xs text-slate-400 block font-medium">ไม่มีรายการลาใน 5 วันทำการข้างหน้า</span>
           </div>
         `;
         return;
@@ -1353,64 +1416,48 @@
       container.innerHTML = leaveList.map(item => {
         let tagIcon = "🏖️";
         let tagText = "พักร้อน";
-        let cardBorder = "border-teal-500/40";
-        let numBoxBg = "bg-[#0e3b3a] border-[#14b8a6]/40 text-[#2dd4bf]";
         let badgeBg = "bg-teal-950 text-teal-300 border-teal-600/40";
 
         if (item.category === "BUSINESS") {
           tagIcon = "💼";
           tagText = "ลากิจ";
-          cardBorder = "border-amber-500/40";
-          numBoxBg = "bg-[#3d2706] border-amber-500/40 text-amber-300";
           badgeBg = "bg-amber-950 text-amber-300 border-amber-600/40";
         } else if (item.category === "SICK") {
           tagIcon = "🤒";
           tagText = "ลาป่วย";
-          cardBorder = "border-rose-500/40";
-          numBoxBg = "bg-[#3b0e14] border-rose-500/40 text-rose-300";
           badgeBg = "bg-rose-950 text-rose-300 border-rose-600/40";
         } else if (item.category === "ONDUTY") {
           tagIcon = "🚗";
           tagText = "On Duty";
-          cardBorder = "border-indigo-500/40";
-          numBoxBg = "bg-[#1e1b4b] border-indigo-500/40 text-indigo-300";
           badgeBg = "bg-indigo-950 text-indigo-300 border-indigo-600/40";
         }
 
         return `
-          <div class="flex items-center justify-between p-3.5 sm:p-4 bg-slate-800/90 hover:bg-slate-800 border ${cardBorder} rounded-2xl shadow-sm transition">
-            <div class="flex items-center gap-3.5">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${numBoxBg} border flex flex-col items-center justify-center shrink-0 shadow-inner">
-                <span class="text-xl sm:text-2xl font-black leading-none">${item.dateInfo.dayNumber}</span>
-                <span class="text-[11px] sm:text-xs font-bold leading-tight mt-0.5">${item.dateInfo.monthName}</span>
+          <div class="flex items-center justify-between p-2.5 bg-slate-800 rounded-xl border border-slate-700/80">
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-lg bg-slate-900 border border-slate-700 text-cyan-300 flex flex-col items-center justify-center shrink-0">
+                <span class="text-sm font-black leading-none">${item.dateInfo.dayNumber}</span>
+                <span class="text-[9px] font-bold leading-tight mt-0.5">${item.dateInfo.monthName}</span>
               </div>
-              
               <div>
-                <h4 class="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+                <h5 class="text-xs sm:text-sm font-bold text-slate-100 flex items-center gap-1">
                   ${item.member}
-                  <span class="text-[11px] px-2 py-0.5 rounded-full font-bold border ${badgeBg}">
+                  <span class="text-[9px] px-1.5 py-0.2 rounded-full border ${badgeBg}">
                     ${tagIcon} ${tagText}
                   </span>
-                </h4>
-                <p class="text-xs sm:text-sm text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
-                  <span class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span>
-                  <span>${item.desc}</span>
-                  <span class="text-slate-500">• ${item.dateInfo.dayName}</span>
-                </p>
+                </h5>
+                <span class="text-[11px] text-slate-400 block mt-0.5">${item.desc}</span>
               </div>
             </div>
-
-            <div class="text-right shrink-0">
-              <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-slate-900 text-slate-200 border border-slate-700 shadow-sm">
-                ${item.dateInfo.relativeBadge}
-              </span>
-            </div>
+            <span class="text-[10px] font-bold bg-slate-900 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">
+              ${item.dateInfo.relativeBadge}
+            </span>
           </div>
         `;
       }).join("");
     }
 
-    // ================= ส่ง REPORT เข้า LINE (ฟอร์แมต Emoji ตามที่กำหนด) =================
+    // ================= ส่ง REPORT เข้า LINE (Emoji ชัดเจน) =================
     function shareTextToLine() {
       const selectedFormatted = formatDisplayDate(activeDate);
       const statRatio = document.getElementById("statRatio").innerText;
@@ -1447,7 +1494,6 @@
       lineText += `📅Date : ${selectedFormatted}\n`;
       lineText += `👤Attendance : ${statRatio} (${statPercent})\n\n`;
 
-      // เงื่อนไข: ถ้าสมาชิก <= 10 คน ให้แสดงรายชื่อคนมาทำงานปกติ
       if (members.length <= 10) {
         lineText += `✅มาทำงาน :\n`;
         if (presentList.length > 0) {
@@ -1459,7 +1505,6 @@
         }
         lineText += `\n❌ไม่มาทำงาน :\n`;
       } else {
-        // กรณีเกิน 10 คน: แสดงเฉพาะคนที่ไม่มาทำงาน
         lineText += `❌ไม่มาทำงาน (${leaveList.length} คน) :\n`;
       }
 
