@@ -516,7 +516,7 @@
     function initSeedData() {
       const db = getDB();
 
-      // ล้างข้อมูลเก่าที่มีตัวเลขลำดับ (เช่น "5.เศวต มาน้อย") ในทุกๆ วันของฐานข้อมูล เพื่อป้องกันชื่อซ้ำ 100%
+      // ล้างข้อมูลเก่าที่มีตัวเลขลำดับ (เช่น "5.เศวต มาน้อย") ในทุกๆ วัน ป้องกันขึ้นเบิ้ล
       for (let date in db) {
         const dayRec = db[date];
         if (dayRec && typeof dayRec === "object") {
@@ -552,7 +552,6 @@
       }
     }
 
-    // ================= ระบบ AUTO MATCHING =================
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
@@ -761,7 +760,6 @@
         advanceTag.classList.add("hidden");
       }
 
-      // แสดงป้ายกำกับว่าวันนี้ถูกบันทึกแล้ว หรือยังไม่ได้บันทึก
       const db = getDB();
       const isDateSaved = !!db[activeDate];
       const statusBadge = document.getElementById("dateSaveStatusBadge");
@@ -945,11 +943,10 @@
 
       db[activeDate] = records;
       saveDB(db);
-      selectDate(activeDate); // รีเฟรชหน้าจอและป้ายสถานะ
+      selectDate(activeDate);
       alert(`✅ บันทึกข้อมูลวันที่ ${formatDisplayDate(activeDate)} เรียบร้อย!`);
     }
 
-    // ================= ฟังก์ชันล้างข้อมูลวันที่เลือก (CLEAR/DELETE RECORD) =================
     function clearCurrentDateData() {
       const db = getDB();
       if (!db[activeDate]) {
@@ -961,11 +958,9 @@
       const isConfirm = confirm(`คุณต้องการลบ/ล้างข้อมูลของวันที่ ${formatted} ออกจากระบบใช่หรือไม่?\n\n(จุดสถานะในปฏิทินจะหายไป และรายการแผนลาล่วงหน้าของวันนี้จะถูกยกเลิก)`);
       if (!isConfirm) return;
 
-      // ลบข้อมูลของวันนั้นออกจากความจำ LocalStorage
       delete db[activeDate];
       saveDB(db);
 
-      // โหลดหน้าจอใหม่ทันที
       selectDate(activeDate);
       alert(`🗑️ ล้างข้อมูลวันที่ ${formatted} เรียบร้อยแล้ว`);
     }
@@ -1070,7 +1065,6 @@
       }
     }
 
-    // ================= คำนวณ 5 วันทำการข้างหน้า (ข้าม ส-อา) =================
     function getNextWorkingDays(baseDateStr, count = 5) {
       const workingDays = [];
       const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
@@ -1106,7 +1100,6 @@
       return workingDays;
     }
 
-    // ================= แสดงการ์ดแผนลาพักร้อน + ลากิจ ใน 5 วันทำการข้างหน้า =================
     function renderUpcomingVacations() {
       const container = document.getElementById("upcomingLeaveContainer");
       const badgeCount = document.getElementById("upcomingLeaveCountBadge");
@@ -1128,7 +1121,6 @@
       next5Days.forEach(dayInfo => {
         let records = {};
 
-        // หากวันใน 5 วันทำการตรงกับวันที่กำลังเปิดหน้าฟอร์ม ให้ดึงค่าจากหน้าฟอร์มทันที
         if (dayInfo.dateStr === activeDate) {
           const members = getMembers();
           members.forEach((m, idx) => {
@@ -1233,6 +1225,7 @@
       `).join("");
     }
 
+    // ================= ส่ง REPORT เข้า LINE (อัปเกรดเงื่อนไข > 10 คน) =================
     function shareTextToLine() {
       const selectedFormatted = formatDisplayDate(activeDate);
       const statRatio = document.getElementById("statRatio").innerText;
@@ -1264,16 +1257,23 @@
       lineText += `📅Date : ${selectedFormatted}\n`;
       lineText += `👤Attendance : ${statRatio} (${statPercent})\n\n`;
 
-      lineText += `✅มาทำงาน :\n`;
-      if (presentList.length > 0) {
-        presentList.forEach((name, i) => {
-          lineText += `${i + 1}.${name}\n`;
-        });
+      // 🎯 เงื่อนไข: ถ้าพนักงานเกิน 10 คน จะไม่ใส่หัวข้อ "มาทำงาน :"
+      if (members.length <= 10) {
+        lineText += `✅มาทำงาน :\n`;
+        if (presentList.length > 0) {
+          presentList.forEach((name, i) => {
+            lineText += `${i + 1}.${name}\n`;
+          });
+        } else {
+          lineText += `- ไม่มี -\n`;
+        }
+        lineText += `\n`;
+        lineText += `❌ไม่มาทำงาน (${leaveList.length} คน) :\n`;
       } else {
-        lineText += `- ไม่มี -\n`;
+        // กรณีเกิน 10 คน: ใส่เฉพาะหัวข้อ ❌ไม่มาทำงาน พร้อมระบุจำนวนคน
+        lineText += `❌ไม่มาทำงาน (${leaveList.length} คน) :\n`;
       }
 
-      lineText += `\n❌ไม่มาทำงาน :\n`;
       if (leaveList.length > 0) {
         leaveList.forEach((item, i) => {
           lineText += `${i + 1}.${item}\n`;
