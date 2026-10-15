@@ -259,6 +259,7 @@
           </h2>
           <div class="flex items-center gap-2 mt-1">
             <span class="text-sm font-bold text-indigo-600" id="formCurrentDate">15-Oct-2026</span>
+            <span id="dateSaveStatusBadge" class="text-[11px] px-2 py-0.5 rounded-full font-bold"></span>
             <span id="advancePlanTag" class="hidden text-[11px] bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded-full font-bold">วางแผนล่วงหน้า</span>
           </div>
         </div>
@@ -270,9 +271,13 @@
 
       <div id="memberInputList" class="space-y-3"></div>
 
-      <div class="pt-2">
-        <button onclick="saveCurrentData()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-lg font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
+      <!-- ปุ่มบันทึกข้อมูล + ปุ่มล้างข้อมูลประจำวัน -->
+      <div class="pt-2 flex gap-3">
+        <button onclick="saveCurrentData()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-lg font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
           <span>💾</span> บันทึกข้อมูลวันนี้ / แผนลา
+        </button>
+        <button onclick="clearCurrentDateData()" id="clearDateBtn" class="bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 border border-rose-200 font-bold px-4 py-3.5 rounded-2xl text-base transition flex items-center justify-center gap-1.5" title="ล้างข้อมูลวันที่เลือก">
+          <span>🗑️</span> <span class="hidden sm:inline">ล้างข้อมูล</span>
         </button>
       </div>
     </div>
@@ -340,6 +345,31 @@
       </div>
     </div>
   </main>
+
+  <!-- ================= SECTION: แผนลาพักร้อน / ลากิจ ใน 5 วันทำการข้างหน้า ================= -->
+  <section class="max-w-6xl mx-auto px-4 mt-8">
+    <div class="bg-slate-900 text-white p-6 sm:p-7 rounded-3xl shadow-xl border border-slate-800">
+      
+      <!-- หัวข้อการ์ด -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-800/80 gap-2">
+        <div>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+            <span>🏖️</span> แผนลาพักร้อน / ลากิจ ใน 5 วันทำการข้างหน้า
+          </h3>
+          <p class="text-slate-400 text-xs sm:text-sm mt-0.5" id="upcomingRangeDesc">
+            เรียงตามวันที่ใกล้ที่สุด (ไม่นับวันเสาร์ - อาทิตย์)
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-cyan-400 bg-cyan-950/80 border border-cyan-500/30 px-3 py-1.5 rounded-xl self-start sm:self-auto font-medium">
+          <span>📅 สรุปยอดแผนลาล่วงหน้า:</span>
+          <span id="upcomingLeaveCountBadge" class="font-extrabold text-white text-sm">0 คน</span>
+        </div>
+      </div>
+
+      <!-- รายการแสดงผลคนลาล่วงหน้า -->
+      <div id="upcomingLeaveContainer" class="space-y-3"></div>
+    </div>
+  </section>
 
   <!-- ================= JAVASCRIPT ================= -->
   <script>
@@ -431,7 +461,6 @@
       "นนทพัทธ์ พากล้า", "สุรกมล แซ่ลี้", "อนวัฒน์ ดุลยกาญจน์", "ปวัน โรจน์ยินดีเลิศ"
     ];
 
-    // รายชื่อเริ่มต้นของทีม 7 ท่าน
     const DEFAULT_MEMBERS = [
       "พิบูลย์ ทีคำ",
       "สันทัศ ใจศิริ",
@@ -469,18 +498,6 @@
     let calendarMonth = 9; // October 2026
     let calendarYear = 2026;
 
-    const SEED_DATA = {
-      [DEFAULT_DATE]: {
-        "พิบูลย์ ทีคำ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-        "สันทัศ ใจศิริ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-        "พีรเทพ ดีแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-        "พงษ์ศิริ แก้วสวัสดิ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-        "เศวต มาน้อย": { type: "VACATION_FULL", hours: 0, text: "ลาพักร้อน เต็มวัน" },
-        "อภิเชษฐ์ ศิริขันธุ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
-        "วีระพงษ์ ทามแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" }
-      }
-    };
-
     function getDB() {
       const db = localStorage.getItem("attendance_gw2_db");
       return db ? JSON.parse(db) : {};
@@ -498,10 +515,38 @@
 
     function initSeedData() {
       const db = getDB();
-      if (!db[DEFAULT_DATE]) {
-        db[DEFAULT_DATE] = SEED_DATA[DEFAULT_DATE];
-        saveDB(db);
+
+      // ล้างข้อมูลเก่าที่มีตัวเลขลำดับ (เช่น "5.เศวต มาน้อย") ในทุกๆ วันของฐานข้อมูล เพื่อป้องกันชื่อซ้ำ 100%
+      for (let date in db) {
+        const dayRec = db[date];
+        if (dayRec && typeof dayRec === "object") {
+          const cleanedDay = {};
+          for (let rawKey in dayRec) {
+            const cleanKey = rawKey.replace(/^\d+[\.\s]+/, '').trim();
+            if (!cleanedDay[cleanKey] || rawKey === cleanKey) {
+              cleanedDay[cleanKey] = dayRec[rawKey];
+            }
+          }
+          db[date] = cleanedDay;
+        }
       }
+
+      if (!db["2026-10-15"]) {
+        db["2026-10-15"] = {
+          "พิบูลย์ ทีคำ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+          "สันทัศ ใจศิริ": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+          "พีรเทพ ดีแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+          "พงษ์ศิริ แก้วสวัสดิ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+          "เศวต มาน้อย": { type: "VACATION_FULL", hours: 0, text: "ลาพักร้อน เต็มวัน" },
+          "อภิเชษฐ์ ศิริขันธุ์": { type: "PRESENT", hours: 0, text: "มาทำงาน" },
+          "วีระพงษ์ ทามแก้ว": { type: "PRESENT", hours: 0, text: "มาทำงาน" }
+        };
+      } else {
+        db["2026-10-15"]["เศวต มาน้อย"] = { type: "VACATION_FULL", hours: 0, text: "ลาพักร้อน เต็มวัน" };
+      }
+
+      saveDB(db);
+
       if (!localStorage.getItem("attendance_gw2_members")) {
         saveMembers(DEFAULT_MEMBERS);
       }
@@ -594,7 +639,6 @@
       }
     });
 
-    // Modal จัดการสมาชิก
     function toggleMemberModal(open) {
       const modal = document.getElementById("memberModal");
       if (open) {
@@ -628,12 +672,10 @@
       });
     }
 
-    // ================= ฟังก์ชันเพิ่มสมาชิกใหม่ (พร้อมเงื่อนไขตรวจสอบ & ยืนยัน) =================
     function addNewMember() {
       const input = document.getElementById("newMemberName");
       let name = input.value.trim();
       
-      // ดักตัดคำนำหน้าออกหากผู้ใช้เผลอพิมพ์
       ['ว่าที่ร.ต.', 'ว่าที่ ร.ต.', 'น.ส.', 'นางสาว', 'นาง', 'นาย'].forEach(p => {
         if (name.startsWith(p)) {
           name = name.substring(p.length).trim();
@@ -645,22 +687,19 @@
 
       const members = getMembers();
 
-      // 1. ตรวจสอบว่ามีชื่อนี้อยู่ในรายชื่อสมาชิกเดิมแล้วหรือไม่
       if (members.includes(name)) {
         alert("ชื่อนี้มีใน รายชื่อสมาชิกแล้ว");
         return;
       }
 
-      // 2. ตรวจสอบว่าชื่อนี้อยู่ในฐานข้อมูลพนักงาน Gateway (Auto Matching) หรือไม่
       const isInDatabase = MASTER_GATEWAY_NAMES.includes(name);
       if (!isInDatabase) {
         const isConfirm = confirm(`ต้องการที่จะ เพิ่มรายชื่อนี้ "${name}" (ที่ไม่อยู่ในฐานข้อมูล) ใช่หรือไม่?`);
         if (!isConfirm) {
-          return; // ผู้กรอกกดยกเลิก
+          return;
         }
       }
 
-      // บันทึกรายชื่อใหม่เข้าสู่ทีม
       members.push(name);
       saveMembers(members);
       input.value = "";
@@ -722,8 +761,26 @@
         advanceTag.classList.add("hidden");
       }
 
+      // แสดงป้ายกำกับว่าวันนี้ถูกบันทึกแล้ว หรือยังไม่ได้บันทึก
+      const db = getDB();
+      const isDateSaved = !!db[activeDate];
+      const statusBadge = document.getElementById("dateSaveStatusBadge");
+      if (statusBadge) {
+        if (isDateSaved) {
+          statusBadge.innerText = "✓ บันทึกแล้ว";
+          statusBadge.className = "text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700 border border-emerald-300";
+        } else {
+          statusBadge.innerText = "รอการบันทึก";
+          statusBadge.className = "text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-slate-100 text-slate-500 border border-slate-300";
+        }
+      }
+
       members.forEach((member, idx) => {
-        const item = records[member] || { type: "PRESENT", hours: 1, text: "มาทำงาน" };
+        let item = records[member] || records[`${idx + 1}.${member}`] || { type: "PRESENT", hours: 1, text: "มาทำงาน" };
+        if (typeof item === "string") {
+          item = { type: item.includes("ลา") ? "VACATION_FULL" : "PRESENT", hours: 1, text: item };
+        }
+
         const div = document.createElement("div");
         div.className = "p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-2";
 
@@ -782,6 +839,7 @@
       }
 
       updateLivePreview();
+      renderUpcomingVacations();
     }
 
     function updateLivePreview() {
@@ -857,6 +915,7 @@
         }
       });
       updateLivePreview();
+      renderUpcomingVacations();
     }
 
     function saveCurrentData() {
@@ -886,8 +945,29 @@
 
       db[activeDate] = records;
       saveDB(db);
-      renderCalendar();
+      selectDate(activeDate); // รีเฟรชหน้าจอและป้ายสถานะ
       alert(`✅ บันทึกข้อมูลวันที่ ${formatDisplayDate(activeDate)} เรียบร้อย!`);
+    }
+
+    // ================= ฟังก์ชันล้างข้อมูลวันที่เลือก (CLEAR/DELETE RECORD) =================
+    function clearCurrentDateData() {
+      const db = getDB();
+      if (!db[activeDate]) {
+        alert(`วันที่ ${formatDisplayDate(activeDate)} ยังไม่มีการบันทึกข้อมูลในระบบครับ`);
+        return;
+      }
+
+      const formatted = formatDisplayDate(activeDate);
+      const isConfirm = confirm(`คุณต้องการลบ/ล้างข้อมูลของวันที่ ${formatted} ออกจากระบบใช่หรือไม่?\n\n(จุดสถานะในปฏิทินจะหายไป และรายการแผนลาล่วงหน้าของวันนี้จะถูกยกเลิก)`);
+      if (!isConfirm) return;
+
+      // ลบข้อมูลของวันนั้นออกจากความจำ LocalStorage
+      delete db[activeDate];
+      saveDB(db);
+
+      // โหลดหน้าจอใหม่ทันที
+      selectDate(activeDate);
+      alert(`🗑️ ล้างข้อมูลวันที่ ${formatted} เรียบร้อยแล้ว`);
     }
 
     function selectDate(dateStr) {
@@ -897,6 +977,7 @@
       renderInputForm(records);
       updateLivePreview();
       renderCalendar();
+      renderUpcomingVacations();
     }
 
     function changeMonth(direction) {
@@ -943,7 +1024,8 @@
         if (hasRecord) {
           const rec = db[fullDate];
           for (let m in rec) {
-            const t = rec[m].type;
+            const item = rec[m];
+            const t = typeof item === 'object' ? item.type : (item.includes('ลา') ? 'VACATION_FULL' : 'PRESENT');
             const cfg = BASE_STATUS_OPTIONS.find(o => o.id === t);
             if (cfg && cfg.isLeave) {
               hasLeave = true;
@@ -986,6 +1068,169 @@
 
         grid.appendChild(btn);
       }
+    }
+
+    // ================= คำนวณ 5 วันทำการข้างหน้า (ข้าม ส-อา) =================
+    function getNextWorkingDays(baseDateStr, count = 5) {
+      const workingDays = [];
+      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      const thaiDays = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
+
+      const [y, m, d] = baseDateStr.split("-").map(Number);
+      const curr = new Date(y, m - 1, d);
+
+      while (workingDays.length < count) {
+        curr.setDate(curr.getDate() + 1);
+        const dayOfWeek = curr.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          const year = curr.getFullYear();
+          const month = String(curr.getMonth() + 1).padStart(2, "0");
+          const day = String(curr.getDate()).padStart(2, "0");
+          const iso = `${year}-${month}-${day}`;
+
+          const diffCalDays = Math.round((curr - new Date(y, m - 1, d)) / (1000 * 60 * 60 * 24));
+          
+          let relativeBadge = `อีก ${diffCalDays} วัน`;
+          if (diffCalDays === 1) relativeBadge = "พรุ่งนี้";
+          else if (dayOfWeek === 1 && diffCalDays <= 4) relativeBadge = "จันทร์หน้า";
+
+          workingDays.push({
+            dateStr: iso,
+            dayNumber: curr.getDate(),
+            monthName: thaiMonths[curr.getMonth()],
+            dayName: thaiDays[dayOfWeek],
+            relativeBadge: relativeBadge
+          });
+        }
+      }
+      return workingDays;
+    }
+
+    // ================= แสดงการ์ดแผนลาพักร้อน + ลากิจ ใน 5 วันทำการข้างหน้า =================
+    function renderUpcomingVacations() {
+      const container = document.getElementById("upcomingLeaveContainer");
+      const badgeCount = document.getElementById("upcomingLeaveCountBadge");
+      const rangeDesc = document.getElementById("upcomingRangeDesc");
+      const db = getDB();
+
+      const baseDate = activeDate || DEFAULT_DATE;
+      const next5Days = getNextWorkingDays(baseDate, 5);
+
+      if (rangeDesc && next5Days.length > 0) {
+        const startDay = next5Days[0];
+        const endDay = next5Days[next5Days.length - 1];
+        rangeDesc.innerText = `อิงจากวันที่เลือก: ${formatDisplayDate(baseDate)} | ช่วงตรวจสอบ 5 วันทำการ: ${startDay.dayNumber} ${startDay.monthName} - ${endDay.dayNumber} ${endDay.monthName} (ไม่นับ ส-อา)`;
+      }
+
+      const leaveList = [];
+      const seenGuard = new Set(); // ป้องกันขึ้นเบิ้ล 100%
+
+      next5Days.forEach(dayInfo => {
+        let records = {};
+
+        // หากวันใน 5 วันทำการตรงกับวันที่กำลังเปิดหน้าฟอร์ม ให้ดึงค่าจากหน้าฟอร์มทันที
+        if (dayInfo.dateStr === activeDate) {
+          const members = getMembers();
+          members.forEach((m, idx) => {
+            const typeElem = document.getElementById(`type_${idx}`);
+            const hourElem = document.getElementById(`hours_${idx}`);
+            if (typeElem) {
+              const tVal = typeElem.value;
+              const cfg = BASE_STATUS_OPTIONS.find(o => o.id === tVal);
+              const hrs = (cfg && cfg.needHours && hourElem) ? hourElem.value : 0;
+              let txt = cfg ? cfg.label : "มาทำงาน";
+              if (cfg && cfg.needHours) txt = `${cfg.prefix} ${hrs} ชั่วโมง`;
+              records[m] = { type: tVal, hours: hrs, text: txt };
+            }
+          });
+        } else {
+          records = db[dayInfo.dateStr] || {};
+        }
+
+        for (let rawMember in records) {
+          const rec = records[rawMember];
+          if (!rec) continue;
+
+          const cleanName = rawMember.replace(/^\d+[\.\s]+/, '').trim();
+          const uniqueKey = `${dayInfo.dateStr}_${cleanName}`;
+          if (seenGuard.has(uniqueKey)) continue;
+
+          let type = "";
+          let desc = "";
+
+          if (typeof rec === "string") {
+            if (rec.includes("ลากิจ")) {
+              type = "BUSINESS_HR";
+              desc = rec;
+            } else if (rec.includes("ลา") || rec.includes("พักร้อน")) {
+              type = "VACATION_FULL";
+              desc = rec;
+            }
+          } else if (typeof rec === "object") {
+            type = rec.type || "";
+            desc = rec.text || "";
+          }
+
+          const isVacation = type.startsWith("VACATION") || desc.includes("พักร้อน");
+          const isBusiness = type.startsWith("BUSINESS") || desc.includes("ลากิจ");
+
+          if (isVacation || isBusiness) {
+            seenGuard.add(uniqueKey);
+            leaveList.push({
+              member: cleanName,
+              desc: desc || (isBusiness ? "ลากิจ" : "ลาพักร้อน"),
+              isBusiness: isBusiness,
+              dateInfo: dayInfo
+            });
+          }
+        }
+      });
+
+      if (badgeCount) {
+        badgeCount.innerText = `${leaveList.length} คน`;
+      }
+
+      if (leaveList.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-slate-800/50 rounded-2xl border border-dashed border-slate-700">
+            <span class="text-3xl block mb-2">🌴</span>
+            <span class="text-slate-300 font-bold block text-base">ไม่มีสมาชิกวางแผนลาพักร้อน หรือ ลากิจ ในช่วง 5 วันทำการข้างหน้า</span>
+            <span class="text-xs text-slate-500 mt-1 block">สามารถคลิกเลือกวันในปฏิทินเพื่อวางแผนและบันทึกการลาล่วงหน้าได้</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = leaveList.map(item => `
+        <div class="flex items-center justify-between p-3.5 sm:p-4 bg-slate-800/90 hover:bg-slate-800 border ${item.isBusiness ? 'border-amber-500/40' : 'border-teal-500/40'} rounded-2xl shadow-sm transition">
+          <div class="flex items-center gap-3.5">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${item.isBusiness ? 'bg-[#3d2706] border border-amber-500/40 text-amber-300' : 'bg-[#0e3b3a] border border-[#14b8a6]/40 text-[#2dd4bf]'} flex flex-col items-center justify-center shrink-0 shadow-inner">
+              <span class="text-xl sm:text-2xl font-black leading-none">${item.dateInfo.dayNumber}</span>
+              <span class="text-[11px] sm:text-xs font-bold leading-tight mt-0.5">${item.dateInfo.monthName}</span>
+            </div>
+            
+            <div>
+              <h4 class="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+                ${item.member}
+                <span class="text-[11px] px-2 py-0.5 rounded-full font-bold ${item.isBusiness ? 'bg-amber-950 text-amber-300 border border-amber-600/40' : 'bg-teal-950 text-teal-300 border border-teal-600/40'}">
+                  ${item.isBusiness ? '💼 ลากิจ' : '🏖️ พักร้อน'}
+                </span>
+              </h4>
+              <p class="text-xs sm:text-sm text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
+                <span class="w-2 h-2 rounded-full ${item.isBusiness ? 'bg-amber-400' : 'bg-cyan-400'} inline-block"></span>
+                <span>${item.desc}</span>
+                <span class="text-slate-500">• ${item.dateInfo.dayName}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="text-right shrink-0">
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold ${item.isBusiness ? 'bg-amber-950/80 text-amber-300 border border-amber-500/30' : 'bg-[#093331] text-[#2dd4bf] border border-[#14b8a6]/30'} shadow-sm">
+              ${item.dateInfo.relativeBadge}
+            </span>
+          </div>
+        </div>
+      `).join("");
     }
 
     function shareTextToLine() {
