@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ตรวจสอบ Attendance ES Quality GW#2</title>
+  <title>ตรวจสอบ Attendance Welding Shop GW</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- html2canvas สำหรับ Export JPEG -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <!-- Google Fonts: Sarabun & Orbitron -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,7 +49,7 @@
       80% { opacity: 1; }
     }
 
-    /* ปฏิทิน: ไฮไลต์เสาร์-อาทิตย์ */
+    /* ปฏิทิน: ไฮไลต์เสาร์-อาทิตย์ / วันหยุด */
     .weekend-col {
       background-color: #fef3c7 !important;
       color: #92400e !important;
@@ -89,7 +87,7 @@
       background-color: #ffffff;
     }
 
-    /* ซ่อน Scrollbar แนวนอน / ตกแต่งแนวตั้ง */
+    /* ตกแต่ง Scrollbar */
     .custom-scroll::-webkit-scrollbar {
       width: 5px;
     }
@@ -121,17 +119,27 @@
         </span>
       </div>
 
-      <!-- ป้ายวันที่ Navbar -->
+      <!-- ป้ายวันที่ Navbar: สามารถแตะ/คลิกเพื่อเลือกวันได้ทันทีโดยตรง -->
       <div class="text-right flex items-center gap-2">
         <span class="text-xs text-slate-400 hidden sm:inline">วันที่เลือก:</span>
-        <span id="activeDateNavbar" class="text-sm sm:text-base font-extrabold text-cyan-300 bg-slate-800 px-3 py-1 rounded-xl border border-slate-700 shadow-inner">
-          15-Oct-2026
-        </span>
+        <div class="relative inline-block cursor-pointer" title="แตะเพื่อเลือกวันที่">
+          <div class="flex items-center gap-1.5 text-sm sm:text-base font-extrabold text-cyan-300 bg-slate-800 hover:bg-slate-700 active:scale-95 px-3 py-1.5 rounded-xl border border-slate-700 shadow-inner transition">
+            <span id="activeDateNavbar">15-Oct-2026</span>
+            <span class="text-xs text-cyan-400">📅</span>
+          </div>
+          <input 
+            type="date" 
+            id="navDatePicker" 
+            value="2026-10-15"
+            onchange="if(this.value) selectDate(this.value)" 
+            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+          />
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- ================= 1. HEADER BANNER (แบบเดิม 100% ตามภาพ) ================= -->
+  <!-- ================= HEADER BANNER ================= -->
   <div class="max-w-7xl mx-auto px-4 pt-4 sm:pt-6 w-full">
     <div class="bg-slate-900 rounded-3xl p-5 sm:p-7 shadow-xl border border-slate-800 text-center relative overflow-hidden">
       <span class="inline-block px-3.5 py-1 bg-cyan-950/80 text-cyan-400 border border-cyan-500/40 rounded-full text-xs sm:text-sm font-bold tracking-wider mb-2 shadow-sm">
@@ -187,19 +195,19 @@
         <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
           <div class="flex items-center gap-1.5">
             <span class="w-2.5 h-2.5 rounded bg-amber-200 border border-amber-300"></span>
-            <span>เสาร์ - อาทิตย์</span>
+            <span>เสาร์-อาทิตย์ / วันหยุด</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded bg-sky-100 border border-sky-300"></span>
+            <span>วันทำงานพิเศษ</span>
           </div>
           <div class="flex items-center gap-1.5">
             <span class="w-2.5 h-2.5 rounded border border-red-500"></span>
             <span>Today (วันนี้)</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
             <span>มาทำงานครบ</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-            <span>มีคนลา / ขาด</span>
           </div>
         </div>
 
@@ -227,7 +235,7 @@
             <h3 class="text-sm font-extrabold text-white flex items-center gap-1.5">
               <span>🏖️</span> แผนลา 5 วันทำการข้างหน้า
             </h3>
-            <span class="text-[10px] text-slate-400 block" id="upcomingRangeDesc">ไม่นับเสาร์ - อาทิตย์</span>
+            <span class="text-[10px] text-slate-400 block" id="upcomingRangeDesc">คำนวณตามวันทำงานจริง</span>
           </div>
           <span id="upcomingLeaveCountBadge" class="text-xs font-black bg-cyan-950 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-lg">
             0 คน
@@ -249,7 +257,6 @@
           <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
             <span>👥</span> จัดการรายชื่อสมาชิก
           </h3>
-          <span class="text-xs text-slate-400">ฐานข้อมูล Gateway: 502 ท่าน</span>
         </div>
         <button onclick="toggleMemberModal(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center transition">
           ✕
@@ -280,10 +287,16 @@
       </div>
       <div class="mt-2 flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scroll" id="manageMemberList"></div>
 
-      <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center">
-        <button onclick="resetDefaultMembers()" class="text-xs text-rose-600 hover:underline font-semibold">
-          รีเซ็ตเป็น 7 ท่านเริ่มต้น
-        </button>
+      <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-2.5">
+          <button onclick="resetDefaultMembers()" class="text-xs text-indigo-600 hover:underline font-bold">
+            รีเซ็ตเป็น 7 ท่านเริ่มต้น
+          </button>
+          <span class="text-slate-300">|</span>
+          <button onclick="clearAllMembers()" class="text-xs text-rose-600 hover:underline font-bold">
+            ล้างรายชื่อสมาชิกทั้งหมด
+          </button>
+        </div>
         <button onclick="toggleMemberModal(false)" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition">
           ปิดหน้าต่าง
         </button>
@@ -294,10 +307,10 @@
   <!-- ================= MAIN CONTENT ================= -->
   <main class="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-5 w-full flex-1">
 
-    <!-- ฝั่งซ้าย: ฟอร์มบันทึกสถานะ (รองรับ 40 คนด้วย 2-Column Grid + Sticky Action Bar) -->
+    <!-- ฝั่งซ้าย: ฟอร์มบันทึกสถานะ (ปรับขนาด Dropdown ให้กะทัดรัด ไม่เบียดชื่อ) -->
     <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col relative">
       
-      <!-- 3. DATE HERO CARD: วันที่ขนาดใหญ่ คมชัด ไม่ต้องเพ่งสายตา (Sticky Top) -->
+      <!-- DATE HERO CARD: วันที่ขนาดใหญ่ คมชัด -->
       <div class="sticky top-[60px] bg-white z-20 pb-3 border-b border-slate-100 mb-3 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.05)]">
         
         <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-3.5 sm:p-4 rounded-2xl shadow-md border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
@@ -309,7 +322,6 @@
               <span id="advancePlanTag" class="hidden text-[11px] bg-cyan-900/90 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-full font-bold">🏖️ วางแผนล่วงหน้า</span>
             </div>
             
-            <!-- ตัวเลขอักษรวันที่ขนาดใหญ่พิเศษ (Hero Size) -->
             <div class="mt-0.5 flex items-baseline gap-2">
               <h2 id="heroDisplayDate" class="text-2xl sm:text-3xl font-black tracking-tight text-white drop-shadow-sm">
                 15-Oct-2026
@@ -329,12 +341,10 @@
         </div>
       </div>
 
-      <!-- 2. พื้นที่แสดงผลรายชื่อ 40 คน: 
-           - มือถือ: 1 คอลัมน์เดี่ยว 
-           - แท็บเล็ต / จอใหญ่: 2 คอลัมน์คู่ (md:grid-cols-2) เพื่อประหยัดพื้นที่แนวตั้ง -->
+      <!-- พื้นที่แสดงผลรายชื่อ 40 คน -->
       <div id="memberInputList" class="grid grid-cols-1 md:grid-cols-2 gap-2 overflow-y-auto max-h-[55vh] sm:max-h-[58vh] pr-1.5 custom-scroll flex-1 py-1"></div>
 
-      <!-- 2. STICKY ACTION BAR ด้านล่าง: ลอยตรึงกับที่ ไม่ต้องเลื่อนจอลงมากดบันทึก -->
+      <!-- STICKY ACTION BAR ด้านล่าง -->
       <div class="sticky bottom-0 bg-white/95 backdrop-blur-md pt-3 mt-2 border-t border-slate-100 flex gap-2 z-20">
         <button onclick="saveCurrentData()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-base sm:text-lg font-bold py-3 px-4 rounded-2xl shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
           <span>💾</span> บันทึกข้อมูลวันนี้ / แผนลา
@@ -347,7 +357,7 @@
 
     </div>
 
-    <!-- ฝั่งขวา: Card Preview & Share LINE -->
+    <!-- ฝั่งขวา: Card Preview & ปุ่มแชร์เข้า LINE -->
     <div class="lg:col-span-5 flex flex-col justify-between gap-4">
       
       <div id="reportCard" class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 text-slate-800 flex-1 flex flex-col justify-between">
@@ -397,20 +407,13 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="grid grid-cols-2 gap-2.5">
-        <button onclick="shareTextToLine()" class="bg-[#06C755] hover:bg-[#05b34c] active:scale-98 text-white text-sm sm:text-base font-bold py-3 px-3 rounded-2xl shadow-md transition flex items-center justify-center gap-1.5">
+      <!-- Action Button -->
+      <div>
+        <button onclick="shareTextToLine()" class="w-full bg-[#06C755] hover:bg-[#05b34c] active:scale-98 text-white text-base sm:text-lg font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2">
           <svg class="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 5.82 2 10.53c0 2.93 1.76 5.51 4.42 7.02-.19.68-.7 2.47-.8 2.84-.13.46.17.45.36.33.15-.09 2.06-1.39 2.91-1.97.36.05.73.08 1.11.08 5.52 0 10-3.82 10-8.53S17.52 2 12 2zm-4.7 11.23h-1.6c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5h1.6c.28 0 .5.22.5.5s-.22.5-.5.5H6.2v1.25h1.1c.28 0 .5.22.5.5s-.22.5-.5.5H6.2V12h1.1c.28 0 .5.22.5.5s-.22.5-.5.5zm2.85 0c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5s.5.22.5.5v4.5c0 .28-.22.5-.5.5zm4.8 0c-.16 0-.31-.08-.39-.21l-2.06-2.92v2.63c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4.5c0-.18.09-.34.25-.43.15-.08.34-.07.48.03l2.06 2.92v-2.55c0-.28.22-.5.5-.5s.5.22.5.5v4.5c0 .28-.22.5-.5.5zm3.15-3.5h-1.5v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5v-4.5c0-.28.22-.5.5-.5h2c.28 0 .5.22.5.5s-.22.5-.5.5h-1.5V9.5h1.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
           </svg>
           ส่งเข้า LINE
-        </button>
-
-        <button onclick="exportToJPEG()" class="bg-slate-800 hover:bg-slate-900 active:scale-98 text-white text-sm sm:text-base font-bold py-3 px-3 rounded-2xl shadow transition flex items-center justify-center gap-1.5">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          Export รูปภาพ
         </button>
       </div>
 
@@ -517,6 +520,41 @@
       "วีระพงษ์ ทามแก้ว"
     ];
 
+    // รายการวันทำงานพิเศษ และวันหยุดพิเศษ
+    const SPECIAL_WORKING_DAYS = new Set([
+      "2026-10-24",
+      "2026-10-31",
+      "2026-11-21",
+      "2026-12-12",
+      "2026-12-19"
+    ]);
+
+    const SPECIAL_HOLIDAYS = {
+      "2026-10-23": "วันปิยมหาราช",
+      "2026-12-07": "วันหยุดชดเชยวันพ่อแห่งชาติ",
+      "2026-12-28": "วันหยุดสิ้นปี",
+      "2026-12-29": "วันหยุดสิ้นปี",
+      "2026-12-30": "วันหยุดสิ้นปี",
+      "2026-12-31": "วันสิ้นปี"
+    };
+
+    function checkDayType(dateStr, dayOfWeek) {
+      const isSpecialWork = SPECIAL_WORKING_DAYS.has(dateStr);
+      const holidayName = SPECIAL_HOLIDAYS[dateStr] || null;
+      const isStandardWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+      if (isSpecialWork) {
+        return { isWorkingDay: true, isHoliday: false, note: "วันทำงานพิเศษ" };
+      }
+      if (holidayName) {
+        return { isWorkingDay: false, isHoliday: true, note: holidayName };
+      }
+      if (isStandardWeekend) {
+        return { isWorkingDay: false, isHoliday: true, note: "เสาร์-อาทิตย์" };
+      }
+      return { isWorkingDay: true, isHoliday: false, note: "" };
+    }
+
     // โครงสร้างประเภทการลาแบบ optgroup ครบถ้วน
     const STATUS_GROUPS = [
       {
@@ -573,7 +611,7 @@
     ];
 
     const BASE_STATUS_OPTIONS = STATUS_GROUPS.flatMap(g => g.options);
-    const ALLOWED_HOURS = [1, 2, 3, 5, 6, 7]; // ตัด 4 ชม. (ครึ่งวัน) และ 8 ชม. (เต็มวัน)
+    const ALLOWED_HOURS = [1, 2, 3, 5, 6, 7];
 
     function getCategoryStyle(category) {
       switch(category) {
@@ -882,6 +920,14 @@
       }
     }
 
+    function clearAllMembers() {
+      if (confirm("⚠️ คุณต้องการล้างรายชื่อสมาชิกทั้งหมดในทีมใช่หรือไม่?\n\n(รายชื่อสมาชิกทั้งหมดจะถูกลบออก)")) {
+        saveMembers([]);
+        renderManageMemberList();
+        selectDate(activeDate);
+      }
+    }
+
     function toggleSidebar(open) {
       const drawer = document.getElementById("calendarDrawer");
       const overlay = document.getElementById("drawerOverlay");
@@ -907,7 +953,7 @@
       toggleSidebar(false);
     }
 
-    // ================= RENDER FORM: 2 คอลัมน์คู่ รองรับ 40 คน =================
+    // ================= RENDER FORM: ปรับขนาด Select ให้กะทัดรัด (w-[108px] / sm:w-[130px]) =================
     function renderInputForm(records) {
       const container = document.getElementById("memberInputList");
       container.innerHTML = "";
@@ -921,7 +967,6 @@
       const advanceTag = document.getElementById("advancePlanTag");
       const dateMeta = getThaiDateMeta(activeDate);
 
-      // 3. ปรับปรุง Date Hero Badge ให้ตัวใหญ่ คมชัด
       document.getElementById("heroDayOfWeek").innerText = `${dateMeta.dayOfWeek} (${dateMeta.thaiFull})`;
       document.getElementById("heroDisplayDate").innerText = formatDisplayDate(activeDate);
 
@@ -950,7 +995,15 @@
         }
       }
 
-      // Render แต่ละคนลง Grid (2 คอลัมน์บนจอแท็บเล็ต/คอม และ 1 คอลัมน์บนมือถือ)
+      if (members.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-1 md:col-span-2 p-8 text-center text-slate-400 bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
+            ยังไม่มีรายชื่อสมาชิกในทีม (กดปุ่ม <b>เมนู & ปฏิทิน > จัดการรายชื่อ</b> เพื่อเพิ่มสมาชิก)
+          </div>
+        `;
+        return;
+      }
+
       members.forEach((member, idx) => {
         let item = records[member] || records[`${idx + 1}.${member}`] || { type: "PRESENT", hours: 1, note: "", text: "มาทำงาน" };
         if (typeof item === "string") {
@@ -976,17 +1029,17 @@
         div.innerHTML = `
           <div class="flex items-center justify-between gap-2">
             
-            <!-- ชื่อขนาดใหญ่ คมชัด -->
+            <!-- ชื่อเต็ม แสดงครบถ้วนไม่ถูกเบียด -->
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
               <span class="text-xs font-black text-slate-400 shrink-0">${idx + 1}.</span>
-              <span class="font-extrabold text-sm sm:text-base text-slate-800 truncate tracking-tight">
+              <span class="font-extrabold text-sm sm:text-base text-slate-800 break-words tracking-tight">
                 ${member}
               </span>
             </div>
 
-            <!-- กล่องสี่เหลี่ยมผืนผ้าเลือกสถานะ (Compact Pill) -->
+            <!-- กล่องเลือกสถานะขนาดกะทัดรัด (w-[108px] บนมือถือ / w-[130px] บนคอม) -->
             <div class="flex items-center gap-1 shrink-0">
-              <select id="type_${idx}" onchange="onStatusChange(${idx})" class="text-xs sm:text-sm font-bold rounded-xl border px-2.5 py-1.5 outline-none transition cursor-pointer ${style.selectClass}">
+              <select id="type_${idx}" onchange="onStatusChange(${idx})" class="w-[108px] sm:w-[130px] text-xs sm:text-sm font-bold rounded-xl border px-2 py-1.5 outline-none transition cursor-pointer truncate ${style.selectClass}">
                 ${STATUS_GROUPS.map(group => `
                   <optgroup label="${group.icon}${group.groupName}">
                     ${group.options.map(opt => `
@@ -998,9 +1051,9 @@
                 `).join("")}
               </select>
               
-              <!-- ช่องเลือกชั่วโมง (1,2,3,5,6,7) -->
+              <!-- ช่องเลือกชั่วโมง ขนาดกะทัดรัด (62px) -->
               <div id="hourWrapper_${idx}" class="${config.needHours ? 'flex' : 'hidden'} items-center">
-                <select id="hours_${idx}" onchange="updateLivePreview()" class="text-xs sm:text-sm font-bold bg-white border border-slate-300 rounded-xl px-2 py-1.5 outline-none text-slate-800 shadow-sm">
+                <select id="hours_${idx}" onchange="updateLivePreview()" class="w-[62px] text-xs sm:text-sm font-bold bg-white border border-slate-300 rounded-xl px-1.5 py-1.5 outline-none text-slate-800 shadow-sm text-center">
                   ${ALLOWED_HOURS.map(h => `
                     <option value="${h}" ${h === currentHours ? "selected" : ""}>${h} ชม.</option>
                   `).join("")}
@@ -1010,7 +1063,6 @@
 
           </div>
 
-          <!-- ช่องกรอกรายละเอียด On Duty -->
           <div id="noteWrapper_${idx}" class="${config.needNote ? 'block' : 'hidden'} pt-1">
             <input 
               type="text" 
@@ -1036,7 +1088,6 @@
       const config = BASE_STATUS_OPTIONS.find(o => o.id === typeVal) || BASE_STATUS_OPTIONS[0];
       const style = getCategoryStyle(config.category);
 
-      // เปิด/ปิดชม.
       if (config.needHours) {
         hourWrapper.classList.remove("hidden");
         hourWrapper.classList.add("flex");
@@ -1045,7 +1096,6 @@
         hourWrapper.classList.remove("flex");
       }
 
-      // เปิด/ปิด Note On Duty
       if (config.needNote) {
         noteWrapper.classList.remove("hidden");
         noteWrapper.classList.add("block");
@@ -1054,7 +1104,7 @@
         noteWrapper.classList.remove("block");
       }
 
-      typeSelect.className = `text-xs sm:text-sm font-bold rounded-xl border px-2.5 py-1.5 outline-none transition cursor-pointer ${style.selectClass}`;
+      typeSelect.className = `w-[108px] sm:w-[130px] text-xs sm:text-sm font-bold rounded-xl border px-2 py-1.5 outline-none transition cursor-pointer truncate ${style.selectClass}`;
       rowElem.className = `p-2 sm:p-2.5 rounded-2xl border transition flex flex-col justify-between gap-1.5 ${style.rowBorder}`;
 
       updateLivePreview();
@@ -1120,6 +1170,9 @@
       const formatted = formatDisplayDate(activeDate);
       document.getElementById("cardDate").innerText = formatted;
       document.getElementById("activeDateNavbar").innerText = formatted;
+
+      const datePicker = document.getElementById("navDatePicker");
+      if (datePicker) datePicker.value = activeDate;
     }
 
     function setAllPresent() {
@@ -1233,7 +1286,7 @@
         const fullDate = `${calendarYear}-${monthStr}-${dayStr}`;
 
         const dayOfWeek = new Date(calendarYear, calendarMonth, d).getDay();
-        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+        const dayStatus = checkDayType(fullDate, dayOfWeek);
         const isToday = (fullDate === realToday);
         const isSelected = (fullDate === activeDate);
         const hasRecord = !!db[fullDate];
@@ -1268,7 +1321,9 @@
         let customClasses = "";
         if (isSelected) {
           customClasses = "bg-indigo-600 text-white font-extrabold shadow-sm ring-2 ring-indigo-400";
-        } else if (isWeekend) {
+        } else if (SPECIAL_WORKING_DAYS.has(fullDate)) {
+          customClasses = "bg-sky-100 hover:bg-sky-200 text-sky-900 border border-sky-300 font-bold";
+        } else if (dayStatus.isHoliday) {
           customClasses = "weekend-col border border-amber-200 font-bold hover:bg-amber-200";
         } else {
           customClasses = "bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200/70";
@@ -1279,6 +1334,7 @@
         }
 
         btn.className = `h-9 rounded-xl flex flex-col items-center justify-center font-bold text-xs transition ${customClasses}`;
+        btn.title = dayStatus.note ? `${d}: ${dayStatus.note}` : "";
         btn.innerHTML = `
           <span>${d}</span>
           <div class="h-1.5 flex items-center justify-center">${statusDot}</div>
@@ -1298,13 +1354,15 @@
 
       while (workingDays.length < count) {
         curr.setDate(curr.getDate() + 1);
+        const year = curr.getFullYear();
+        const month = String(curr.getMonth() + 1).padStart(2, "0");
+        const day = String(curr.getDate()).padStart(2, "0");
+        const iso = `${year}-${month}-${day}`;
         const dayOfWeek = curr.getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-          const year = curr.getFullYear();
-          const month = String(curr.getMonth() + 1).padStart(2, "0");
-          const day = String(curr.getDate()).padStart(2, "0");
-          const iso = `${year}-${month}-${day}`;
 
+        const dayStatus = checkDayType(iso, dayOfWeek);
+
+        if (dayStatus.isWorkingDay) {
           const diffCalDays = Math.round((curr - new Date(y, m - 1, d)) / (1000 * 60 * 60 * 24));
           
           let relativeBadge = `อีก ${diffCalDays} วัน`;
@@ -1335,7 +1393,7 @@
       if (rangeDesc && next5Days.length > 0) {
         const startDay = next5Days[0];
         const endDay = next5Days[next5Days.length - 1];
-        rangeDesc.innerText = `ช่วง ${startDay.dayNumber} ${startDay.monthName} - ${endDay.dayNumber} ${endDay.monthName} (ไม่นับ ส-อา)`;
+        rangeDesc.innerText = `ช่วง ${startDay.dayNumber} ${startDay.monthName} - ${endDay.dayNumber} ${endDay.monthName} (วันทำงานจริง)`;
       }
 
       const leaveList = [];
@@ -1457,7 +1515,7 @@
       }).join("");
     }
 
-    // ================= ส่ง REPORT เข้า LINE (Emoji ชัดเจน) =================
+    // ส่ง REPORT เข้า LINE
     function shareTextToLine() {
       const selectedFormatted = formatDisplayDate(activeDate);
       const statRatio = document.getElementById("statRatio").innerText;
@@ -1490,9 +1548,9 @@
         }
       });
 
-      let lineText = `🎯Attendance Report\n`;
-      lineText += `📅Date : ${selectedFormatted}\n`;
-      lineText += `👤Attendance : ${statRatio} (${statPercent})\n\n`;
+      let lineText = `🎯 Attendance Report\n`;
+      lineText += `📅 Date : ${selectedFormatted}\n`;
+      lineText += `👤 Attendance : ${statRatio} (${statPercent})\n\n`;
 
       if (members.length <= 10) {
         lineText += `✅มาทำงาน :\n`;
@@ -1522,28 +1580,6 @@
 
       const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineText)}`;
       window.location.href = lineUrl;
-    }
-
-    function exportToJPEG() {
-      const reportElement = document.getElementById("reportCard");
-      const fileName = `Attendance_GW2_${formatDisplayDate(activeDate)}.jpg`;
-
-      html2canvas(reportElement, {
-        scale: 2.5,
-        backgroundColor: "#ffffff",
-        useCORS: true
-      }).then(canvas => {
-        const imgURI = canvas.toDataURL("image/jpeg", 0.95);
-        const link = document.createElement("a");
-        link.download = fileName;
-        link.href = imgURI;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }).catch(err => {
-        console.error(err);
-        alert("เกิดข้อผิดพลาดในการ Export JPEG");
-      });
     }
 
     window.addEventListener("DOMContentLoaded", () => {
