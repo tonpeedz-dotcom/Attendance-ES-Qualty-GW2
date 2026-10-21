@@ -107,14 +107,15 @@
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
 
   <!-- ================= POP-UP ต้อนรับสุดน่ารัก (แสดงทุกครั้งที่เปิดเว็บ) ================= -->
+  <!-- ================= POP-UP ต้อนรับสุดน่ารัก (แสดงทุกครั้งที่เปิดเว็บ) ================= -->
   <div id="welcomeModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+    
+    <!-- กล่องนี้สำคัญมาก ห้ามลบ (ถ้าหาย UI จะเรียงแนวนอนทันที) -->
     <div class="bg-gradient-to-b from-white via-slate-50 to-indigo-50/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-indigo-200 text-center relative transform scale-95 transition-all duration-300">
       
-            <!-- Icon หัวกล่อง -->
+      <!-- Icon หัวกล่อง (เปลี่ยนเป็นรูปภาพของคุณต้น) -->
       <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-3xl bg-gradient-to-tr from-pink-500 via-indigo-600 to-cyan-400 p-1 shadow-lg shadow-indigo-300/50 flex items-center justify-center mb-4">
-        <!-- เปลี่ยนจาก div ใบไม้ เป็นแท็ก img และใส่ชื่อไฟล์รูปของคุณ -->
         <img src="Screenshot_20261018_191240_Gallery.jpg" alt="Profile" class="w-full h-full object-cover rounded-[22px]">
-      </div>
       </div>
 
       <!-- ป้าย Badge -->
@@ -127,7 +128,7 @@
         PROGRAM ATTENDANCE (W)
       </h3>
 
-      <!-- ข้อความต้อนรับ ตัวอักษรใหญ่ ชัดเจน อ่านง่าย -->
+      <!-- ข้อความต้อนรับ -->
      <div class="my-5 p-4 sm:p-5 bg-white/95 rounded-2xl border border-indigo-100 shadow-inner">
         <p class="text-base sm:text-xl font-bold text-slate-700 leading-relaxed">
           ยินดีต้อนรับพี่ๆทุกคน<br>
@@ -142,8 +143,10 @@
       <button onclick="closeWelcomeModal()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 hover:from-indigo-700 hover:to-pink-600 active:scale-98 text-white text-base sm:text-xl font-black py-3.5 px-6 rounded-2xl shadow-xl shadow-indigo-300/50 transition-all flex items-center justify-center gap-2">
         <span>🚀 รับทราบและพร้อมจะลุย 🚀</span>
       </button>
+      
     </div>
   </div>
+
 
   <!-- ================= TOP NAVBAR ================= -->
   <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 border-b border-slate-800">
