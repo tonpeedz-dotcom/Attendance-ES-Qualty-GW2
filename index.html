@@ -17,8 +17,8 @@
   <link rel="apple-touch-icon" href="Screenshot_20261018_191240_Gallery.jpg">
   <link rel="apple-touch-icon" sizes="180x180" href="Screenshot_20261018_191240_Gallery.jpg">
 
-  <!-- Web App Manifest (Data URI - ติดตั้งได้ทันทีโดยไม่ต้องสร้างไฟล์แยก) -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"PROGRAM ATTENDANCE (W) GW & BP PLANT","short_name":"Attendance(W)","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","orientation":"portrait","icons":[{"src":"Screenshot_20261018_191240_Gallery.jpg","sizes":"192x192 512x512","type":"image/jpeg"}]}'>
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -122,10 +122,8 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
 
-  <!-- ================= POP-UP ต้อนรับสุดน่ารัก (แสดงทุกครั้งที่เปิดเว็บ) ================= -->
+  <!-- ================= POP-UP ต้อนรับ ================= -->
   <div id="welcomeModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
-    
-    <!-- กล่องนี้สำคัญมาก ห้ามลบ (ถ้าหาย UI จะเรียงแนวนอนทันที) -->
     <div class="bg-gradient-to-b from-white via-slate-50 to-indigo-50/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-indigo-200 text-center relative transform scale-95 transition-all duration-300">
       
       <!-- Icon หัวกล่อง -->
@@ -155,7 +153,7 @@
       </div>
 
       <!-- ปุ่มติดตั้งแอป (Android & iOS) -->
-      <button onclick="openInstallModal()" class="w-full mb-2 bg-slate-800 hover:bg-slate-700 active:scale-98 text-cyan-300 hover:text-white border border-slate-700 text-xs sm:text-sm font-extrabold py-2.5 px-4 rounded-2xl transition flex items-center justify-center gap-2 shadow-sm">
+      <button id="welcomeInstallBtn" onclick="openInstallModal()" class="w-full mb-2 bg-slate-800 hover:bg-slate-700 active:scale-98 text-cyan-300 hover:text-white border border-slate-700 text-xs sm:text-sm font-extrabold py-2.5 px-4 rounded-2xl transition flex items-center justify-center gap-2 shadow-sm">
         <span>📲</span>
         <span>ติดตั้งแอปลงหน้าจอมือถือ (Android & iOS)</span>
       </button>
@@ -186,7 +184,7 @@
         </span>
       </div>
 
-      <!-- ป้ายวันที่ Navbar: สามารถแตะ/คลิกเพื่อเลือกวันได้ทันทีโดยตรง -->
+      <!-- ป้ายวันที่ Navbar -->
       <div class="text-right flex items-center gap-2">
         <span class="text-xs text-slate-400 hidden sm:inline">วันที่เลือก:</span>
         <div class="relative inline-block cursor-pointer" title="แตะเพื่อเลือกวันที่">
@@ -221,7 +219,7 @@
     </div>
   </div>
 
-  <!-- ================= SLIDE BAR: ปฏิทิน + จัดการสมาชิก + สรุปแผนลา 5 วันทำการ ================= -->
+  <!-- ================= SLIDE BAR: ปฏิทิน + จัดการสมาชิก ================= -->
   <div id="drawerOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
 
   <aside id="calendarDrawer" class="fixed top-0 left-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out">
@@ -311,7 +309,7 @@
         </button>
       </div>
 
-      <!-- สรุปแผนลาพักร้อน / ลากิจ / On Duty ใน 5 วันทำการข้างหน้า -->
+      <!-- สรุปแผนลา 5 วันทำการ -->
       <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md border border-slate-800 space-y-3">
         <div class="flex justify-between items-center pb-2 border-b border-slate-800">
           <div>
@@ -330,6 +328,7 @@
 
     </div>
   </aside>
+
 
   <!-- ================= POP-UP แนะนำการติดตั้งแอป (Android & iOS) ================= -->
   <div id="installModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none font-['Sarabun']">
@@ -379,16 +378,16 @@
         
         <!-- เนื้อหาฝั่ง Android -->
         <div id="androidGuide" class="space-y-3">
-          <!-- ปุ่ม Native Install สำหรับ Android (ถ้า Browser รองรับ beforeinstallprompt) -->
-          <div id="nativeInstallBox" class="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-2">
-            <span class="text-xs font-bold text-emerald-800 block">กดปุ่มด้านล่างเพื่อติดตั้งลงเครื่องทันที</span>
+          <!-- ปุ่ม Native Install สำหรับ Android (จะแสดงเมื่อ Chrome ส่งสัญญาณพร้อมติดตั้งจริงเท่านั้น) -->
+          <div id="nativeInstallBox" class="hidden p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-2">
+            <span class="text-xs font-bold text-emerald-800 block">เบราว์เซอร์พร้อมติดตั้งทันที:</span>
             <button id="nativeInstallBtn" onclick="triggerNativeInstall()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2.5 px-4 rounded-xl shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2 text-sm">
               <span>🚀</span>
-              <span>ติดตั้งแอปลงเครื่องเดี๋ยวนี้</span>
+              <span>กดเพื่อติดตั้งแอปลงเครื่องเดี๋ยวนี้</span>
             </button>
           </div>
 
-          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">หรือทำตามขั้นตอนง่ายๆ 3 ขั้น:</div>
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">ขั้นตอนการติดตั้งบน Android Chrome:</div>
           
           <div class="space-y-2">
             <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3">
@@ -558,7 +557,7 @@
   <!-- ================= MAIN CONTENT ================= -->
   <main class="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-5 w-full flex-1">
 
-    <!-- ฝั่งซ้าย: ฟอร์มบันทึกสถานะ (ปรับขนาด Dropdown ให้กะทัดรัด ไม่เบียดชื่อ) -->
+    <!-- ฝั่งซ้าย: ฟอร์มบันทึกสถานะ -->
     <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col relative">
       
       <!-- DATE HERO CARD: วันที่ขนาดใหญ่ คมชัด -->
@@ -592,7 +591,7 @@
         </div>
       </div>
 
-      <!-- พื้นที่แสดงผลรายชื่อ 40 คน -->
+      <!-- พื้นที่แสดงผลรายชื่อ -->
       <div id="memberInputList" class="grid grid-cols-1 md:grid-cols-2 gap-2 overflow-y-auto max-h-[55vh] sm:max-h-[58vh] pr-1.5 custom-scroll flex-1 py-1"></div>
 
       <!-- STICKY ACTION BAR ด้านล่าง -->
@@ -672,7 +671,7 @@
   </main>
 
   <!-- ================= JAVASCRIPT ================= -->
-  <!-- 1. โหลดฐานข้อมูลพนักงาน (1,019 ท่าน) -->
+  <!-- 1. โหลดฐานข้อมูลพนักงาน -->
   <script src="employees.js"></script>
 
   <!-- 2. สคริปต์การทำงานหลักของระบบ -->
@@ -1218,7 +1217,7 @@
       toggleSidebar(false);
     }
 
-    // ================= RENDER FORM: ปรับขนาด Select ให้กะทัดรัด (w-[108px] / sm:w-[130px]) =================
+    // ================= RENDER FORM =================
     function renderInputForm(records) {
       const container = document.getElementById("memberInputList");
       container.innerHTML = "";
@@ -1294,7 +1293,7 @@
         div.innerHTML = `
           <div class="flex items-center justify-between gap-2">
             
-            <!-- ชื่อเต็ม แสดงครบถ้วนไม่ถูกเบียด -->
+            <!-- ชื่อเต็ม -->
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
               <span class="text-xs font-black text-slate-400 shrink-0">${idx + 1}.</span>
               <span class="font-extrabold text-sm sm:text-base text-slate-800 break-words tracking-tight">
@@ -1302,7 +1301,7 @@
               </span>
             </div>
 
-            <!-- กล่องเลือกสถานะขนาดกะทัดรัด (w-[108px] บนมือถือ / w-[130px] บนคอม) -->
+            <!-- กล่องเลือกสถานะ -->
             <div class="flex items-center gap-1 shrink-0">
               <select id="type_${idx}" onchange="onStatusChange(${idx})" class="w-[108px] sm:w-[130px] text-xs sm:text-sm font-bold rounded-xl border px-2 py-1.5 outline-none transition cursor-pointer truncate ${style.selectClass}">
                 ${STATUS_GROUPS.map(group => `
@@ -1316,7 +1315,7 @@
                 `).join("")}
               </select>
               
-              <!-- ช่องเลือกชั่วโมง ขนาดกะทัดรัด (62px) -->
+              <!-- ช่องเลือกชั่วโมง -->
               <div id="hourWrapper_${idx}" class="${config.needHours ? 'flex' : 'hidden'} items-center">
                 <select id="hours_${idx}" onchange="updateLivePreview()" class="w-[62px] text-xs sm:text-sm font-bold bg-white border border-slate-300 rounded-xl px-1.5 py-1.5 outline-none text-slate-800 shadow-sm text-center">
                   ${ALLOWED_HOURS.map(h => `
@@ -1847,14 +1846,22 @@
       window.location.href = lineUrl;
     }
 
+
     // ================= ระบบติดตั้งแอป (PWA INSTALLATION - ANDROID & IOS) =================
     let deferredInstallPrompt = null;
 
+    // ลงทะเบียน Service Worker เพื่อให้ผ่านเกณฑ์ PWA ของ Chrome 100%
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    // ดักรับสัญญาณพร้อมติดตั้งจาก Chrome บน Android
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
-      const navBtn = document.getElementById("pwaInstallNavBtn");
-      if (navBtn) navBtn.classList.remove("hidden");
+      // แสดงปุ่ม Native 1-Click ทันทีที่เบราว์เซอร์พร้อมติดตั้งจริง
       const nativeBox = document.getElementById("nativeInstallBox");
       if (nativeBox) nativeBox.classList.remove("hidden");
     });
@@ -1873,6 +1880,8 @@
       if (navBtn) navBtn.classList.add("hidden");
       const drawerCard = document.getElementById("drawerInstallCard");
       if (drawerCard) drawerCard.classList.add("hidden");
+      const welcomeBtn = document.getElementById("welcomeInstallBtn");
+      if (welcomeBtn) welcomeBtn.classList.add("hidden");
     }
 
     function checkDeviceAndInitInstall() {
@@ -1949,8 +1958,6 @@
           closeInstallModal();
           hideInstalledUi();
         }
-      } else {
-        alert("กรุณาแตะที่ปุ่ม 3 จุด (⋮) ด้านขวาบนของเบราว์เซอร์ แล้วเลือก 'ติดตั้งแอป' หรือ 'เพิ่มลงในหน้าจอหลัก' ครับ");
       }
     }
 
