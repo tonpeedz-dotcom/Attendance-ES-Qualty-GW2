@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ตรวจสอบ Attendance Welding Shop GW</title>
+
+  <!-- ================= PWA & APP INSTALLATION SETTINGS ================= -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Attendance (W)">
+
+  <!-- iOS Safari Specific -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Attendance (W)">
+  <link rel="apple-touch-icon" href="Screenshot_20261018_191240_Gallery.jpg">
+  <link rel="apple-touch-icon" sizes="180x180" href="Screenshot_20261018_191240_Gallery.jpg">
+
+  <!-- Web App Manifest (Data URI - ติดตั้งได้ทันทีโดยไม่ต้องสร้างไฟล์แยก) -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"PROGRAM ATTENDANCE (W) GW & BP PLANT","short_name":"Attendance(W)","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","orientation":"portrait","icons":[{"src":"Screenshot_20261018_191240_Gallery.jpg","sizes":"192x192 512x512","type":"image/jpeg"}]}'>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Sarabun & Orbitron -->
@@ -112,7 +128,7 @@
     <!-- กล่องนี้สำคัญมาก ห้ามลบ (ถ้าหาย UI จะเรียงแนวนอนทันที) -->
     <div class="bg-gradient-to-b from-white via-slate-50 to-indigo-50/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-indigo-200 text-center relative transform scale-95 transition-all duration-300">
       
-      <!-- Icon หัวกล่อง (เปลี่ยนเป็นรูปภาพของคุณต้น) -->
+      <!-- Icon หัวกล่อง -->
       <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-3xl bg-gradient-to-tr from-pink-500 via-indigo-600 to-cyan-400 p-1 shadow-lg shadow-indigo-300/50 flex items-center justify-center mb-4">
         <img src="Screenshot_20261018_191240_Gallery.jpg" alt="Profile" class="w-full h-full object-cover rounded-[22px]">
       </div>
@@ -128,7 +144,7 @@
       </h3>
 
       <!-- ข้อความต้อนรับ -->
-     <div class="my-5 p-4 sm:p-5 bg-white/95 rounded-2xl border border-indigo-100 shadow-inner">
+      <div class="my-5 p-4 sm:p-5 bg-white/95 rounded-2xl border border-indigo-100 shadow-inner">
         <p class="text-base sm:text-xl font-bold text-slate-700 leading-relaxed">
           ยินดีต้อนรับพี่ๆทุกคน<br>
           สู่ <span class="text-indigo-600 font-extrabold">PROGRAM ATTENDANCE (W)</span><br>
@@ -137,6 +153,12 @@
           🔥แล้วเอาเวลาที่เหลือ ไปใช้ชีวิตซะ🔥
         </p>
       </div>
+
+      <!-- ปุ่มติดตั้งแอป (Android & iOS) -->
+      <button onclick="openInstallModal()" class="w-full mb-2 bg-slate-800 hover:bg-slate-700 active:scale-98 text-cyan-300 hover:text-white border border-slate-700 text-xs sm:text-sm font-extrabold py-2.5 px-4 rounded-2xl transition flex items-center justify-center gap-2 shadow-sm">
+        <span>📲</span>
+        <span>ติดตั้งแอปลงหน้าจอมือถือ (Android & iOS)</span>
+      </button>
 
       <!-- ปุ่มกดรับทราบ -->
       <button onclick="closeWelcomeModal()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 hover:from-indigo-700 hover:to-pink-600 active:scale-98 text-white text-base sm:text-xl font-black py-3.5 px-6 rounded-2xl shadow-xl shadow-indigo-300/50 transition-all flex items-center justify-center gap-2">
@@ -150,12 +172,16 @@
   <!-- ================= TOP NAVBAR ================= -->
   <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar(true)" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-3.5 py-2 rounded-xl text-sm font-bold shadow transition">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="toggleSidebar(true)" class="flex items-center gap-1.5 sm:gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow transition shrink-0">
           <span>📅</span>
           <span>เมนู & ปฏิทิน</span>
         </button>
-        <span class="hidden sm:inline-block text-xs text-cyan-400 font-semibold tracking-wider">
+        <button id="pwaInstallNavBtn" onclick="openInstallModal()" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-extrabold shadow transition shrink-0">
+          <span>📲</span>
+          <span>ติดตั้งแอป</span>
+        </button>
+        <span class="hidden md:inline-block text-xs text-cyan-400 font-semibold tracking-wider">
           WELDING SHOP ATTENDANCE SYSTEM
         </span>
       </div>
@@ -212,6 +238,22 @@
 
     <div class="p-4 overflow-y-auto flex-1 space-y-5 custom-scroll">
       
+      <!-- การ์ดติดตั้งแอปลงมือถือ -->
+      <div id="drawerInstallCard" class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-2xl p-3 flex justify-between items-center text-white shadow-sm">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-400/30 text-indigo-300 flex items-center justify-center text-lg shrink-0">
+            📲
+          </div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-white">ติดตั้งแอปลงมือถือ</h4>
+            <span class="text-[10px] text-cyan-300 font-medium block">Android & iOS เปิดใช้งานเต็มจอ</span>
+          </div>
+        </div>
+        <button onclick="openInstallModal()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 active:scale-95 text-slate-950 font-black text-xs px-3 py-1.5 rounded-xl shadow transition shrink-0">
+          ติดตั้ง
+        </button>
+      </div>
+
       <!-- ปุ่มเปิด Modal จัดการสมาชิก -->
       <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-3.5 flex justify-between items-center">
         <div>
@@ -289,6 +331,142 @@
     </div>
   </aside>
 
+  <!-- ================= POP-UP แนะนำการติดตั้งแอป (Android & iOS) ================= -->
+  <div id="installModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none font-['Sarabun']">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 text-slate-800 relative transform scale-95 transition-all duration-300 max-h-[90vh] flex flex-col">
+      
+      <!-- หัว Modal -->
+      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center text-xl shadow-md">
+            📲
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+              ติดตั้ง PROGRAM ATTENDANCE
+            </h3>
+            <span class="text-[11px] text-slate-400 font-semibold">ใช้งานสะดวกรวดเร็ว เหมือนแอปบนมือถือ</span>
+          </div>
+        </div>
+        <button onclick="closeInstallModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-90 text-slate-500 font-bold flex items-center justify-center transition">
+          ✕
+        </button>
+      </div>
+
+      <!-- กล่องแจ้งเตือนกรณีเปิดจาก LINE In-App Browser -->
+      <div id="lineBrowserAlert" class="hidden mt-3 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-xs font-semibold">
+        <div class="flex items-start gap-2">
+          <span class="text-base shrink-0">⚠️</span>
+          <div>
+            <b class="text-amber-800">กำลังเปิดอยู่ในแอป LINE:</b> เพื่อให้สามารถติดตั้งได้ กรุณาแตะปุ่ม <b>3 จุด (⋮)</b> หรือเมนูด้านล่าง แล้วเลือก <b>"เปิดด้วยเบราว์เซอร์อื่น"</b> (Chrome หรือ Safari)
+          </div>
+        </div>
+      </div>
+
+      <!-- แถบเลือกสลับ Android / iOS -->
+      <div class="mt-3.5 bg-slate-100 p-1 rounded-2xl flex gap-1">
+        <button id="tabAndroidBtn" onclick="switchInstallTab('android')" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-1.5 bg-white text-indigo-700 shadow-sm">
+          <span>🤖</span>
+          <span>Android (Chrome)</span>
+        </button>
+        <button id="tabIosBtn" onclick="switchInstallTab('ios')" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+          <span>🍎</span>
+          <span>iPhone / iPad (iOS)</span>
+        </button>
+      </div>
+
+      <div class="mt-3.5 flex-1 overflow-y-auto space-y-3 custom-scroll pr-1 text-xs sm:text-sm">
+        
+        <!-- เนื้อหาฝั่ง Android -->
+        <div id="androidGuide" class="space-y-3">
+          <!-- ปุ่ม Native Install สำหรับ Android (ถ้า Browser รองรับ beforeinstallprompt) -->
+          <div id="nativeInstallBox" class="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-2">
+            <span class="text-xs font-bold text-emerald-800 block">กดปุ่มด้านล่างเพื่อติดตั้งลงเครื่องทันที</span>
+            <button id="nativeInstallBtn" onclick="triggerNativeInstall()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-2.5 px-4 rounded-xl shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2 text-sm">
+              <span>🚀</span>
+              <span>ติดตั้งแอปลงเครื่องเดี๋ยวนี้</span>
+            </button>
+          </div>
+
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">หรือทำตามขั้นตอนง่ายๆ 3 ขั้น:</div>
+          
+          <div class="space-y-2">
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <p class="font-extrabold text-slate-800">แตะเมนู 3 จุด (⋮)</p>
+                <p class="text-slate-500 text-[11px] mt-0.5">อยู่ที่มุมขวาบนของเบราว์เซอร์ Google Chrome</p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <p class="font-extrabold text-slate-800">เลือก "ติดตั้งแอป" หรือ "เพิ่มลงในหน้าจอหลัก"</p>
+                <p class="text-slate-500 text-[11px] mt-0.5">เมนู (Install app / Add to Home screen)</p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <p class="font-extrabold text-slate-800">กด "ติดตั้ง" (Install)</p>
+                <p class="text-slate-500 text-[11px] mt-0.5">ไอคอน Attendance จะถูกสร้างบนหน้าจอมือถือของคุณทันที</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- เนื้อหาฝั่ง iOS (iPhone / iPad) -->
+        <div id="iosGuide" class="hidden space-y-3">
+          <div class="p-3 bg-sky-50 rounded-2xl border border-sky-200 text-xs text-sky-900 font-semibold flex items-center gap-2">
+            <span>💡</span>
+            <span>สำหรับ iPhone / iPad แนะนำให้เปิดด้วยเบราว์เซอร์ <b>Safari</b></span>
+          </div>
+
+          <div class="space-y-2">
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <p class="font-extrabold text-slate-800 flex items-center gap-1">
+                  แตะปุ่มแชร์ <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-white border border-slate-300 text-blue-600 font-bold text-[10px] shadow-xs">⎋</span> (Share)
+                </p>
+                <p class="text-slate-500 text-[11px] mt-0.5">อยู่ที่แถบเมนูด้านล่างสุดของหน้าจอ Safari</p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <p class="font-extrabold text-slate-800 flex items-center gap-1">
+                  เลือก "เพิ่มไปยังหน้าจอโฮม" <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-white border border-slate-300 text-slate-700 font-bold text-[11px] shadow-xs">➕</span>
+                </p>
+                <p class="text-slate-500 text-[11px] mt-0.5">เลื่อนลงมาที่รายการเมนู แล้วแตะ (Add to Home Screen)</p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <p class="font-extrabold text-slate-800">แตะ "เพิ่ม" (Add) มุมขวาบน</p>
+                <p class="text-slate-500 text-[11px] mt-0.5">แอปจะไปอยู่ที่หน้าจอโฮม เปิดใช้งานแบบเต็มจอได้เลย!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ปุ่มปิดด้านล่าง -->
+      <div class="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+        <button onclick="closeInstallModal()" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 active:scale-95 text-white text-xs sm:text-sm font-bold py-2.5 px-6 rounded-xl transition shadow-sm">
+          เข้าใจแล้ว / ปิดหน้าต่าง
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ================= MODAL จัดการสมาชิก ================= -->
   <div id="memberModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 shadow-2xl border border-slate-200 max-h-[88vh] flex flex-col relative font-['Sarabun']">
@@ -315,7 +493,7 @@
       <div class="mt-3.5 space-y-2 relative">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <!-- เมนูเลือกฝ่าย สไตล์โค้งมนฟอนต์ Sarabun -->
-      <select id="filterDept" onchange="onFilterDeptChange()" class="w-full bg-slate-50 hover:bg-slate-100/70 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition cursor-pointer">
+          <select id="filterDept" onchange="onFilterDeptChange()" class="w-full bg-slate-50 hover:bg-slate-100/70 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition cursor-pointer">
             <option value="">-- เลือกฝ่าย (ทั้งหมด) --</option>
             <option value="GW (PRODUCTION 1 (G/W))">GW (PRODUCTION 1 (G/W))</option>
             <option value="GW (MAINTENANCE G/W)">GW (MAINTENANCE G/W)</option>
@@ -493,13 +671,13 @@
     </div>
   </main>
 
-<!-- ================= JAVASCRIPT ================= -->
+  <!-- ================= JAVASCRIPT ================= -->
   <!-- 1. โหลดฐานข้อมูลพนักงาน (1,019 ท่าน) -->
   <script src="employees.js"></script>
 
   <!-- 2. สคริปต์การทำงานหลักของระบบ -->
   <script>
-   const MASTER_GATEWAY_DB = DB_RAW.map(item => {
+    const MASTER_GATEWAY_DB = DB_RAW.map(item => {
       let deptName = "BP (PRODUCTION 1 (BP))";
       const lineUpper = (item[2] || "").toUpperCase();
       
@@ -802,7 +980,8 @@
     function handleAutoMatch(query) {
       const box = document.getElementById("autoMatchBox");
       const filterDept = document.getElementById("filterDept").value;
-      const filterLine = document.getElementById("filterLine").value;
+      const filterLine = document.getElementById("filterLine");
+      const filterLineVal = filterLine ? filterLine.value : "";
 
       let cleanQ = query.trim();
       ['ว่าที่ร.ต.', 'ว่าที่ ร.ต.', 'น.ส.', 'นางสาว', 'นาง', 'นาย', 'ส.อ.'].forEach(p => {
@@ -814,7 +993,7 @@
       const searchWords = cleanQ.split(/\s+/).filter(w => w.length > 0);
 
       // ซ่อนกล่องถ้ายัังไม่มีการเลือกตัวกรอง และไม่มีการพิมพ์ค้นหา
-      if (!filterDept && !filterLine && searchWords.length === 0) {
+      if (!filterDept && !filterLineVal && searchWords.length === 0) {
         box.classList.add("hidden");
         box.innerHTML = "";
         return;
@@ -823,7 +1002,7 @@
       const matches = MASTER_GATEWAY_DB.filter(person => {
         // กรองตามแผนกและหน่วยงาน
         if (filterDept && person.dept !== filterDept) return false;
-        if (filterLine && person.line !== filterLine) return false;
+        if (filterLineVal && person.line !== filterLineVal) return false;
         
         // กรองตามข้อความที่พิมพ์
         if (searchWords.length > 0) {
@@ -850,7 +1029,7 @@
       header.innerHTML = `<span>พบ ${matches.length} รายชื่อ</span><span>แตะเพื่อเลือก</span>`;
       box.appendChild(header);
 
-      // จำกัดโชว์ 50 รายการแรกเพื่อไม่ให้หน้าจอกระตุกบนมือถือเวลาเลือกทั้งแผนก
+      // จำกัดโชว์ 50 รายการแรกเพื่อไม่ให้หน้าจอกระตุกบนมือถือ
       matches.slice(0, 50).forEach(person => {
         const item = document.createElement("div");
         item.className = "px-3.5 py-2 hover:bg-indigo-50 active:bg-indigo-100 cursor-pointer transition border-b border-slate-100 last:border-none flex flex-col gap-1";
@@ -863,12 +1042,12 @@
           } catch(e) {}
         });
 
-// แสดงฝ่ายแบบย่อใน UI
-let shortDept = person.dept;
-if (person.dept === 'GW (PRODUCTION 1 (G/W))') shortDept = 'GW';
-else if (person.dept === 'GW (MAINTENANCE G/W)') shortDept = 'GW (MTN)';
-else if (person.dept === 'BP (PRODUCTION 1 (BP))') shortDept = 'BP';
-else if (person.dept === 'BP (MAINTENANCE BP)') shortDept = 'BP (MTN)';
+        // แสดงฝ่ายแบบย่อใน UI
+        let shortDept = person.dept;
+        if (person.dept === 'GW (PRODUCTION 1 (G/W))') shortDept = 'GW';
+        else if (person.dept === 'GW (MAINTENANCE G/W)') shortDept = 'GW (MTN)';
+        else if (person.dept === 'BP (PRODUCTION 1 (BP))') shortDept = 'BP';
+        else if (person.dept === 'BP (MAINTENANCE BP)') shortDept = 'BP (MTN)';
         
         item.innerHTML = `
           <div class="flex justify-between items-center">
@@ -881,7 +1060,7 @@ else if (person.dept === 'BP (MAINTENANCE BP)') shortDept = 'BP (MTN)';
         `;
 
         item.addEventListener("click", () => {
-          selectMatchedName(person.name); // ส่งเฉพาะชื่อไปกรอกใน input
+          selectMatchedName(person.name);
         });
 
         box.appendChild(item);
@@ -1668,12 +1847,122 @@ else if (person.dept === 'BP (MAINTENANCE BP)') shortDept = 'BP (MTN)';
       window.location.href = lineUrl;
     }
 
+    // ================= ระบบติดตั้งแอป (PWA INSTALLATION - ANDROID & IOS) =================
+    let deferredInstallPrompt = null;
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const navBtn = document.getElementById("pwaInstallNavBtn");
+      if (navBtn) navBtn.classList.remove("hidden");
+      const nativeBox = document.getElementById("nativeInstallBox");
+      if (nativeBox) nativeBox.classList.remove("hidden");
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      hideInstalledUi();
+    });
+
+    function isStandaloneMode() {
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    function hideInstalledUi() {
+      const navBtn = document.getElementById("pwaInstallNavBtn");
+      if (navBtn) navBtn.classList.add("hidden");
+      const drawerCard = document.getElementById("drawerInstallCard");
+      if (drawerCard) drawerCard.classList.add("hidden");
+    }
+
+    function checkDeviceAndInitInstall() {
+      if (isStandaloneMode()) {
+        hideInstalledUi();
+        return;
+      }
+
+      // ตรวจสอบกรณีเปิดจาก LINE In-App Browser
+      const isLine = /Line/i.test(navigator.userAgent);
+      const lineAlert = document.getElementById("lineBrowserAlert");
+      if (lineAlert) {
+        if (isLine) lineAlert.classList.remove("hidden");
+        else lineAlert.classList.add("hidden");
+      }
+
+      // ตรวจสอบ iOS
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      switchInstallTab(isIos ? "ios" : "android");
+    }
+
+    function switchInstallTab(type) {
+      const tabAndroidBtn = document.getElementById("tabAndroidBtn");
+      const tabIosBtn = document.getElementById("tabIosBtn");
+      const androidGuide = document.getElementById("androidGuide");
+      const iosGuide = document.getElementById("iosGuide");
+
+      if (type === "ios") {
+        tabIosBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-1.5 bg-white text-indigo-700 shadow-sm";
+        tabAndroidBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+        iosGuide.classList.remove("hidden");
+        androidGuide.classList.add("hidden");
+      } else {
+        tabAndroidBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-1.5 bg-white text-indigo-700 shadow-sm";
+        tabIosBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+        androidGuide.classList.remove("hidden");
+        iosGuide.classList.add("hidden");
+      }
+    }
+
+    function openInstallModal() {
+      checkDeviceAndInitInstall();
+      const modal = document.getElementById("installModal");
+      if (modal) {
+        modal.classList.remove("opacity-0", "pointer-events-none");
+        modal.classList.add("opacity-100", "pointer-events-auto");
+        const card = modal.querySelector("div");
+        if (card) {
+          card.classList.remove("scale-95");
+          card.classList.add("scale-100");
+        }
+      }
+    }
+
+    function closeInstallModal() {
+      const modal = document.getElementById("installModal");
+      if (modal) {
+        modal.classList.add("opacity-0", "pointer-events-none");
+        modal.classList.remove("opacity-100", "pointer-events-auto");
+        const card = modal.querySelector("div");
+        if (card) {
+          card.classList.add("scale-95");
+          card.classList.remove("scale-100");
+        }
+      }
+    }
+
+    async function triggerNativeInstall() {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        if (outcome === "accepted") {
+          deferredInstallPrompt = null;
+          closeInstallModal();
+          hideInstalledUi();
+        }
+      } else {
+        alert("กรุณาแตะที่ปุ่ม 3 จุด (⋮) ด้านขวาบนของเบราว์เซอร์ แล้วเลือก 'ติดตั้งแอป' หรือ 'เพิ่มลงในหน้าจอหลัก' ครับ");
+      }
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       initSeedData();
       selectDate(realToday);
 
       // แสดง Pop-up ยินดีต้อนรับทุกครั้งที่เปิดเว็บไซต์
       openWelcomeModal();
+      if (isStandaloneMode()) {
+        hideInstalledUi();
+      }
 
       const input = document.getElementById("newMemberName");
       if (input) {
